@@ -52,7 +52,7 @@ with st.sidebar:
 if selected == "🩸 Diabetes Prediction" or selected == "❤️ Heart Disease Prediction":
     # Load data for diabetes and heart disease prediction
     diabetes_data = pd.read_csv('C:\\Users\\sudha\\OneDrive\\Documents\\GitHub\\combined-disease-prediction-test\\diabetes.csv')  # Update with your diabetes dataset path
-    heart_disease_data = pd.read_csv('/content/heart.csv')  # Update with your heart disease dataset path
+    heart_disease_data = pd.read_csv('C:\\Users\\sudha\\OneDrive\\Documents\\GitHub\\combined-disease-prediction-test\\heart.csv')  # Update with your heart disease dataset path
 
     # Training SVM model for diabetes prediction
     X_diabetes = diabetes_data.drop(columns='Outcome', axis=1)

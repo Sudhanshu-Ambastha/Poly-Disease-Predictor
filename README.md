@@ -45,4 +45,5 @@ Multiple disease dataset: Custom dataset used for training and testing.
 ## Note
 Make sure to have Python and Anaconda installed.
 Internet connection is required to run the application.
+
 Feel free to contribute and enhance the application!

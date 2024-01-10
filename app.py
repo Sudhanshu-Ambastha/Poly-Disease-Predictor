@@ -4,7 +4,6 @@ from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import train_test_split
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
-from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score
 import numpy as np
 
@@ -74,55 +73,11 @@ if selected == "🩸 Diabetes Prediction" or selected == "❤️ Heart Disease P
     rf_classifier_heart = RandomForestClassifier(n_estimators=100)
     rf_classifier_heart.fit(X_heart_train, Y_heart_train)
 
-# Diabetes Prediction Page
-if selected == "🩸 Diabetes Prediction":
-    st.title("Diabetes Prediction using SVM")
-
-    # User input for symptoms
-    symptoms_diabetes = st.text_input("Enter Symptoms (comma-separated)")
-
-    # Initialize the result
-    diagnosis_diabetes = ''
-
-    # Create a button to check symptoms
-    if st.button("Check Symptoms"):
-        # Call the predict_diabetes function with user input
-        diabetes_predictions = predict_diabetes(symptoms_diabetes.split(","), X_diabetes, svm_classifier_diabetes, scaler_diabetes)
-        diagnosis_diabetes = "The person is diabetic" if diabetes_predictions[0] == 1 else "The person is not diabetic"
-        st.success(diagnosis_diabetes)
-
-# Heart Disease Prediction Page
-if selected == "❤️ Heart Disease Prediction":
-    st.title("Heart Disease Prediction using RandomForest")
-
-    # User input for symptoms
-    age = st.number_input("Age")
-    sex = st.number_input("Sex")
-    cp = st.number_input("Chest Pain types")
-    trestbps = st.number_input("Resting Blood Pressure")
-    chol = st.number_input("Serum Cholestoral in mg/dl")
-    fbs = st.number_input("Fasting Blood Sugar > 120 mg/dl")
-    restecg = st.number_input("Resting Electrocardiographic results")
-    thalach = st.number_input("Maximum Heart Rate achieved")
-    exang = st.number_input("Exercise Induced Angina")
-    oldpeak = st.number_input("ST depression induced by exercise")
-    slope = st.number_input("Slope of the peak exercise ST segment")
-    ca = st.number_input("Major vessels colored by flourosopy")
-    thal = st.number_input("thal: 0 = normal; 1 = fixed defect; 2 = reversable defect")
-
-    # Prediction button
-    if st.button("Heart Disease Test Result"):
-        heart_prediction = rf_classifier_heart.predict(
-            [[age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak, slope, ca, thal]]
-        )
-        heart_diagnosis = "The person is having heart disease" if heart_prediction[0] == 1 else "The person does not have any heart disease"
-        st.success(heart_diagnosis)
-
 # Multiple Disease Prediction Page
 if selected == "🦠 Multiple Disease Prediction":
     st.title("Multiple Disease Prediction using Symptoms")
 
-# Load data
+    # Load data for multiple disease prediction
     train_data = pd.read_csv('C:\\Users\\sudha\\OneDrive\\Documents\\GitHub\\combined-disease-prediction-test\\Training.csv')
     test_data = pd.read_csv('C:\\Users\\sudha\\OneDrive\\Documents\\GitHub\\combined-disease-prediction-test\\Testing.csv')
 
@@ -148,3 +103,51 @@ if selected == "🦠 Multiple Disease Prediction":
         diseases_multiple = predict_diseases(symptoms_multiple.split(","), features, rf)
         diagnosis_multiple = f"Predicted Diseases: {', '.join(diseases_multiple)}"
         st.success(diagnosis_multiple)
+
+# Diabetes Prediction Page
+if selected == "🩸 Diabetes Prediction":
+    st.title("Diabetes Prediction using SVM")
+
+    # Input fields for symptoms
+    pregnancies = st.number_input("Number of Pregnancies")
+    glucose = st.number_input("Glucose Level")
+    blood_pressure = st.number_input("Blood Pressure value")
+    skin_thickness = st.number_input("Skin Thickness value")
+    insulin = st.number_input("Insulin Level")
+    bmi = st.number_input("BMI value")
+    diabetes_pedigree_function = st.number_input("Diabetes Pedigree Function value")
+    age = st.number_input("Age of the Person")
+
+    # Prediction button
+    if st.button("Diabetes Test Result"):
+        # Call the predict_diabetes function with user input
+        diab_prediction = predict_diabetes([pregnancies, glucose, blood_pressure, skin_thickness, insulin, bmi, diabetes_pedigree_function, age], X_diabetes, svm_classifier_diabetes, scaler_diabetes)
+        diab_diagnosis = "The person is diabetic" if diab_prediction[0] == 1 else "The person is not diabetic"
+        st.success(diab_diagnosis)
+
+# Heart Disease Prediction Page
+if selected == "❤️ Heart Disease Prediction":
+    st.title("Heart Disease Prediction using RandomForest")
+
+    # User input for symptoms
+    age_heart = st.number_input("Age")
+    sex_heart = st.number_input("Sex")
+    cp_heart = st.number_input("Chest Pain types")
+    trestbps_heart = st.number_input("Resting Blood Pressure")
+    chol_heart = st.number_input("Serum Cholestoral in mg/dl")
+    fbs_heart = st.number_input("Fasting Blood Sugar > 120 mg/dl")
+    restecg_heart = st.number_input("Resting Electrocardiographic results")
+    thalach_heart = st.number_input("Maximum Heart Rate achieved")
+    exang_heart = st.number_input("Exercise Induced Angina")
+    oldpeak_heart = st.number_input("ST depression induced by exercise")
+    slope_heart = st.number_input("Slope of the peak exercise ST segment")
+    ca_heart = st.number_input("Major vessels colored by flourosopy")
+    thal_heart = st.number_input("thal: 0 = normal; 1 = fixed defect; 2 = reversable defect")
+
+    # Prediction button
+    if st.button("Heart Disease Test Result"):
+        heart_prediction = rf_classifier_heart.predict(
+            [[age_heart, sex_heart, cp_heart, trestbps_heart, chol_heart, fbs_heart, restecg_heart, thalach_heart, exang_heart, oldpeak_heart, slope_heart, ca_heart, thal_heart]]
+        )
+        heart_diagnosis = "The person is having heart disease" if heart_prediction[0] == 1 else "The person does not have any heart disease"
+        st.success(heart_diagnosis)

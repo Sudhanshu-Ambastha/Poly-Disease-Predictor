@@ -1,0 +1,21 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+}
+
+.container {
+    display: flex;
+}
+
+.sidebar {
+    background-color: #f1f1f1;
+    padding: 20px;
+    width: 200px;
+}
+
+.content {
+    padding: 20px;
+    flex-grow: 1;
+}
+
+/* Add additional styling as needed */

@@ -20,11 +20,12 @@ def predict_diseases(symptoms, features, rf):
     return predictions
 
 # Set the paths for your models
-diabetes_model_path = 'C:\Users\sudha\OneDrive\Documents\GitHub\combined-disease-prediction-test\Diabetes prediction bot trained_model.sav'
-heart_disease_model_path = 'C:\Users\sudha\OneDrive\Documents\GitHub\combined-disease-prediction-test\Heart disease prediction bot trained_model.sav'
+base_path = 'C:\\Users\\sudha\\OneDrive\\Documents\\GitHub\\combined-disease-prediction-test'
+diabetes_model_path = 'models/diabetes_model.pkl'
+heart_disease_model_path = 'models/heart_model.pkl'
 
 # Loading the saved models
-diabetes_model = pickle.load(open( diabetes_model_path, 'rb'))
+diabetes_model = pickle.load(open(diabetes_model_path, 'rb'))
 heart_disease_model = pickle.load(open(heart_disease_model_path, 'rb'))
 
 # Sidebar for navigation
@@ -38,8 +39,8 @@ if selected == "🦠 Multiple Disease Prediction":
     st.title("Multiple Disease Prediction using Symptoms")
 
     # Load data
-    train_data = pd.read_csv('C:\Users\sudha\OneDrive\Documents\GitHub\combined-disease-prediction-test\Training.csv')
-    test_data = pd.read_csv('C:\Users\sudha\OneDrive\Documents\GitHub\combined-disease-prediction-test\Testing.csv')
+    train_data = pd.read_csv('C:\\Users\\sudha\\OneDrive\\Documents\\GitHub\\combined-disease-prediction-test\\Training.csv')
+    test_data = pd.read_csv('C:\\Users\\sudha\\OneDrive\\Documents\\GitHub\\combined-disease-prediction-test\\Testing.csv')
 
     # Split data into features and target variable
     features = train_data.drop('prognosis', axis=1)

@@ -122,9 +122,9 @@ if selected == "❤️ Heart Disease Prediction":
 if selected == "🦠 Multiple Disease Prediction":
     st.title("Multiple Disease Prediction using Symptoms")
 
-    # Load data for multiple disease prediction
-    train_data = pd.read_csv('/content/Training.csv')  # Update with your multiple disease dataset path
-    test_data = pd.read_csv('/content/Testing.csv')  # Update with your multiple disease dataset path
+# Load data
+    train_data = pd.read_csv('C:\\Users\\sudha\\OneDrive\\Documents\\GitHub\\combined-disease-prediction-test\\Training.csv')
+    test_data = pd.read_csv('C:\\Users\\sudha\\OneDrive\\Documents\\GitHub\\combined-disease-prediction-test\\Testing.csv')
 
     # Split data into features and target variable
     features = train_data.drop('prognosis', axis=1)

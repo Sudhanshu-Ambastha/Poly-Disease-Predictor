@@ -79,7 +79,7 @@ if selected == "🦠 Multiple Disease Prediction":
 
     # Load data for multiple disease prediction
     train_data = pd.read_csv('C:\\Users\\sudha\\OneDrive\\Documents\\GitHub\\combined-disease-prediction-test\\Streamlit app\\Training.csv')
-    test_data = pd.read_csv('C:\\Users\\sudha\\OneDrive\\Documents\\GitHub\\combined-disease-prediction-test\\Testing.csv')
+    test_data = pd.read_csv('C:\\Users\\sudha\\OneDrive\\Documents\\GitHub\\combined-disease-prediction-test\\Streamlit app\\Testing.csv')
 
     # Split data into features and target variable
     features = train_data.drop('prognosis', axis=1)

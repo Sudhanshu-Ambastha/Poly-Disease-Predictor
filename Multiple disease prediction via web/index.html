@@ -25,16 +25,17 @@
         .container {
             max-width: 800px;
             margin: 0 auto;
+            display: flex;
         }
         .sidebar {
-            flex: 1;
             background-color: #333;
             padding: 1em;
             color: white;
             text-align: center;
+            width: 200px;
         }
         .content {
-            flex: 2;
+            flex: 1;
             padding: 1em;
             background-color: white;
             border: 1px solid #ddd;
@@ -49,6 +50,7 @@
             display: flex;
             flex-wrap: wrap;
             justify-content: space-between;
+            margin-top: 1em;
         }
         .input-fields label {
             margin-bottom: 0.5em;
@@ -85,11 +87,30 @@
 
         <div class="content">
             <div class="input-fields" id="diabetes-inputs">
-                <!-- Input fields for diabetes prediction -->
+                <label for="pregnancies">Number of Pregnancies</label>
+                <input type="number" id="pregnancies">
+                <label for="glucose">Glucose Level</label>
+                <input type="number" id="glucose">
+                <label for="blood-pressure">Blood Pressure value</label>
+                <input type="number" id="blood-pressure">
+                <label for="skin-thickness">Skin Thickness value</label>
+                <input type="number" id="skin-thickness">
+                <label for="insulin">Insulin Level</label>
+                <input type="number" id="insulin">
+                <label for="bmi">BMI value</label>
+                <input type="number" id="bmi">
+                <label for="diabetes-pedigree">Diabetes Pedigree Function value</label>
+                <input type="number" id="diabetes-pedigree">
+                <label for="age">Age of the Person</label>
+                <input type="number" id="age">
             </div>
 
             <div class="input-fields" id="heart-inputs" style="display: none;">
-                <!-- Input fields for heart disease prediction -->
+                <label for="age-heart">Age</label>
+                <input type="number" id="age-heart">
+                <label for="sex-heart">Sex</label>
+                <input type="number" id="sex-heart">
+                <!-- Add more input fields for heart disease prediction -->
             </div>
 
             <div class="input-fields" id="multiple-inputs" style="display: none;">

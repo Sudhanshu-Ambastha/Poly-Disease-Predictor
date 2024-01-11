@@ -55,6 +55,11 @@
         .input-fields label {
             margin-bottom: 0.5em;
             display: block;
+            width: 100%;
+        }
+        .input-fields input {
+            width: calc(50% - 0.5em);
+            margin-bottom: 0.5em;
         }
         .button-container {
             text-align: center;
@@ -110,7 +115,28 @@
                 <input type="number" id="age-heart">
                 <label for="sex-heart">Sex</label>
                 <input type="number" id="sex-heart">
-                <!-- Add more input fields for heart disease prediction -->
+                <label for="cp-heart">Chest Pain types</label>
+                <input type="number" id="cp-heart">
+                <label for="trestbps-heart">Resting Blood Pressure</label>
+                <input type="number" id="trestbps-heart">
+                <label for="chol-heart">Serum Cholestoral in mg/dl</label>
+                <input type="number" id="chol-heart">
+                <label for="fbs-heart">Fasting Blood Sugar > 120 mg/dl</label>
+                <input type="number" id="fbs-heart">
+                <label for="restecg-heart">Resting Electrocardiographic results</label>
+                <input type="number" id="restecg-heart">
+                <label for="thalach-heart">Maximum Heart Rate achieved</label>
+                <input type="number" id="thalach-heart">
+                <label for="exang-heart">Exercise Induced Angina</label>
+                <input type="number" id="exang-heart">
+                <label for="oldpeak-heart">ST depression induced by exercise</label>
+                <input type="number" id="oldpeak-heart">
+                <label for="slope-heart">Slope of the peak exercise ST segment</label>
+                <input type="number" id="slope-heart">
+                <label for="ca-heart">Major vessels colored by flourosopy</label>
+                <input type="number" id="ca-heart">
+                <label for="thal-heart">thal: 0 = normal; 1 = fixed defect; 2 = reversable defect</label>
+                <input type="number" id="thal-heart">
             </div>
 
             <div class="input-fields" id="multiple-inputs" style="display: none;">
@@ -166,3 +192,4 @@
     </script>
 </body>
 </html>
+

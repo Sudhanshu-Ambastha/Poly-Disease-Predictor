@@ -19,14 +19,30 @@
         }
         main {
             padding: 1em;
+            display: flex;
+            justify-content: space-between;
         }
         .container {
             max-width: 800px;
             margin: 0 auto;
         }
+        .sidebar {
+            flex: 1;
+            background-color: #333;
+            padding: 1em;
+            color: white;
+            text-align: center;
+        }
+        .content {
+            flex: 2;
+            padding: 1em;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
         .radio-options {
             display: flex;
-            justify-content: space-around;
+            flex-direction: column;
             margin-bottom: 1em;
         }
         .input-fields {
@@ -56,34 +72,38 @@
         <h1>PolyDisease Predictor</h1>
     </header>
     <main class="container">
-        <div class="radio-options">
-            <input type="radio" name="predictor" value="diabetes" id="diabetes-radio" checked>
-            <label for="diabetes-radio">Diabetes Prediction</label>
-            <input type="radio" name="predictor" value="heart" id="heart-radio">
-            <label for="heart-radio">Heart Disease Prediction</label>
-            <input type="radio" name="predictor" value="multiple" id="multiple-radio">
-            <label for="multiple-radio">Multiple Disease Prediction</label>
+        <div class="sidebar">
+            <div class="radio-options">
+                <input type="radio" name="predictor" value="diabetes" id="diabetes-radio" checked>
+                <label for="diabetes-radio">Diabetes Prediction</label>
+                <input type="radio" name="predictor" value="heart" id="heart-radio">
+                <label for="heart-radio">Heart Disease Prediction</label>
+                <input type="radio" name="predictor" value="multiple" id="multiple-radio">
+                <label for="multiple-radio">Multiple Disease Prediction</label>
+            </div>
         </div>
 
-        <div class="input-fields" id="diabetes-inputs">
-            <!-- Input fields for diabetes prediction -->
-        </div>
+        <div class="content">
+            <div class="input-fields" id="diabetes-inputs">
+                <!-- Input fields for diabetes prediction -->
+            </div>
 
-        <div class="input-fields" id="heart-inputs" style="display: none;">
-            <!-- Input fields for heart disease prediction -->
-        </div>
+            <div class="input-fields" id="heart-inputs" style="display: none;">
+                <!-- Input fields for heart disease prediction -->
+            </div>
 
-        <div class="input-fields" id="multiple-inputs" style="display: none;">
-            <label for="symptoms">Enter Symptoms (comma-separated)</label>
-            <input type="text" id="symptoms" placeholder="e.g., symptom1, symptom2, ...">
-        </div>
+            <div class="input-fields" id="multiple-inputs" style="display: none;">
+                <label for="symptoms">Enter Symptoms (comma-separated)</label>
+                <input type="text" id="symptoms" placeholder="e.g., symptom1, symptom2, ...">
+            </div>
 
-        <div class="button-container">
-            <button onclick="checkSymptoms()">Check Symptoms</button>
-        </div>
+            <div class="button-container">
+                <button onclick="checkSymptoms()">Check Symptoms</button>
+            </div>
 
-        <div class="result" id="result" style="display: none;">
-            <!-- Result will be displayed here -->
+            <div class="result" id="result" style="display: none;">
+                <!-- Result will be displayed here -->
+            </div>
         </div>
     </main>
 

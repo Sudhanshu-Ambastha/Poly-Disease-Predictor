@@ -23,7 +23,7 @@
             justify-content: space-between;
         }
         .container {
-            max-width: 1200px;
+            max-width: 800px;
             margin: 0 auto;
             display: flex;
         }
@@ -31,7 +31,7 @@
             background-color: #333;
             padding: 1em;
             color: white;
-            text-align: left;
+            text-align: center;
             width: 200px;
         }
         .content {
@@ -40,17 +40,17 @@
             background-color: white;
             border: 1px solid #ddd;
             border-radius: 5px;
-            display: flex;
-            flex-wrap: wrap;
-            gap: 1em;
         }
         .radio-options {
             display: flex;
             flex-direction: column;
-            gap: 0.5em;
+            margin-bottom: 1em;
         }
         .input-fields {
-            flex: 1 1 calc(50% - 0.5em);
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-top: 1em;
         }
         .input-fields label {
             margin-bottom: 0.5em;
@@ -58,7 +58,7 @@
             width: 100%;
         }
         .input-fields input {
-            width: 100%;
+            width: calc(50% - 0.5em);
             margin-bottom: 0.5em;
         }
         .button-container {

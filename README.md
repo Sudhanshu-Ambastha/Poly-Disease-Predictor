@@ -19,7 +19,7 @@ pip install -r requirements.txt
 Open Anaconda Command Prompt and run the following command:
 
 ```bash
-streamlit run "C:\Users\sudha\OneDrive\Documents\GitHub\combined-disease-prediction-test\app.py"
+streamlit run "C:\Users\sudha\OneDrive\Documents\GitHub\combined-disease-prediction-test\Streamlit app\app.py"
 ```
 ## Access the Application:
 Open your web browser and navigate to the provided URL (usually http://localhost:8501).

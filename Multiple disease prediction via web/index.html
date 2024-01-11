@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PolyDisease Predictor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+        }
+        header {
+            background-color: #333;
+            padding: 1em;
+            color: white;
+            text-align: center;
+        }
+        main {
+            padding: 1em;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+        .radio-options {
+            display: flex;
+            justify-content: space-around;
+            margin-bottom: 1em;
+        }
+        .input-fields {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+        }
+        .input-fields label {
+            margin-bottom: 0.5em;
+            display: block;
+        }
+        .button-container {
+            text-align: center;
+            margin-top: 1em;
+        }
+        .result {
+            margin-top: 1em;
+            padding: 1em;
+            background-color: #dff0d8;
+            border: 1px solid #d6e9c6;
+            color: #3c763d;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>PolyDisease Predictor</h1>
+    </header>
+    <main class="container">
+        <div class="radio-options">
+            <input type="radio" name="predictor" value="diabetes" id="diabetes-radio" checked>
+            <label for="diabetes-radio">Diabetes Prediction</label>
+            <input type="radio" name="predictor" value="heart" id="heart-radio">
+            <label for="heart-radio">Heart Disease Prediction</label>
+            <input type="radio" name="predictor" value="multiple" id="multiple-radio">
+            <label for="multiple-radio">Multiple Disease Prediction</label>
+        </div>
+
+        <div class="input-fields" id="diabetes-inputs">
+            <!-- Input fields for diabetes prediction -->
+        </div>
+
+        <div class="input-fields" id="heart-inputs" style="display: none;">
+            <!-- Input fields for heart disease prediction -->
+        </div>
+
+        <div class="input-fields" id="multiple-inputs" style="display: none;">
+            <label for="symptoms">Enter Symptoms (comma-separated)</label>
+            <input type="text" id="symptoms" placeholder="e.g., symptom1, symptom2, ...">
+        </div>
+
+        <div class="button-container">
+            <button onclick="checkSymptoms()">Check Symptoms</button>
+        </div>
+
+        <div class="result" id="result" style="display: none;">
+            <!-- Result will be displayed here -->
+        </div>
+    </main>
+
+    <script>
+        // JavaScript code for handling radio button changes and form submission
+        const diabetesInputs = document.getElementById('diabetes-inputs');
+        const heartInputs = document.getElementById('heart-inputs');
+        const multipleInputs = document.getElementById('multiple-inputs');
+        const resultContainer = document.getElementById('result');
+
+        document.querySelectorAll('input[name="predictor"]').forEach((radio) => {
+            radio.addEventListener('change', () => {
+                diabetesInputs.style.display = 'none';
+                heartInputs.style.display = 'none';
+                multipleInputs.style.display = 'none';
+
+                if (radio.value === 'diabetes') {
+                    diabetesInputs.style.display = 'flex';
+                } else if (radio.value === 'heart') {
+                    heartInputs.style.display = 'flex';
+                } else if (radio.value === 'multiple') {
+                    multipleInputs.style.display = 'flex';
+                }
+            });
+        });
+
+        function checkSymptoms() {
+            // JavaScript code to handle form submission and display result
+            const symptomsInput = document.getElementById('symptoms');
+            const resultText = document.getElementById('result');
+
+            // Example: You can fetch data from the inputs and send it to the server or process it in JavaScript
+            const symptoms = symptomsInput.value.split(',');
+
+            // Example: Displaying result
+            resultText.innerHTML = `<p>Predicted Diseases: ${symptoms.join(', ')}</p>`;
+            resultText.style.display = 'block';
+        }
+    </script>
+</body>
+</html>

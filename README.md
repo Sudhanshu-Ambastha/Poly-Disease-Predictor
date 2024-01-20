@@ -38,7 +38,7 @@ Multiple disease dataset: Custom dataset used for training and testing.
 
 ## Note
 
-- This project is designed for easy accessibility without downloading the files. Users can run it directly via VS Code by changing the terminal path to make it easily accessible. If users encounter issues like "file not found," ensure the terminal path is correctly set within VS Code.
+This project is designed for easy accessibility without downloading the files. Users can run it directly via VS Code by changing the terminal path to make it easily accessible. If users encounter issues like "file not found," ensure the terminal path is correctly set within VS Code.
 
 - **Ensure Python and Anaconda are Installed:**
   Make sure to have Python and Anaconda installed.
@@ -46,5 +46,10 @@ Multiple disease dataset: Custom dataset used for training and testing.
 - **Internet Connection Required:**
   Internet connection is required to run the application.
 
+- **GitHub Repository Link:**
+  Access the GitHub repository for Combined Disease Prediction Bot: [Combined Disease Prediction Bot](https://github.com/Sudhanshu-Ambastha/Combined-Disease-Prediction-Bot)
+
+  **Update:**
+  This project was created to address challenges faced in earlier models, making it easy to run directly via VS Code, especially when opened through GitHub Desktop. With the presence of necessary files, the project can now be executed seamlessly.
 
 Feel free to contribute and enhance the application!

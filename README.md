@@ -8,13 +8,7 @@ PolyDisease Predictor is a Streamlit web application that allows users to predic
    ```bash
    git clone https://github.com/your-username/combined-disease-prediction-test.git
    cd combined-disease-prediction-test
-
-## Install Dependencies:
-
-```bash
-pip install -r requirements.txt
-```
-
+   ```
 ## Run the Application:
 Open Anaconda Command Prompt and run the following command:
 
@@ -43,7 +37,14 @@ Heart disease dataset: UCI Heart Disease Dataset
 Multiple disease dataset: Custom dataset used for training and testing.
 
 ## Note
-Make sure to have Python and Anaconda installed.
-Internet connection is required to run the application.
+
+- This project is designed for easy accessibility without downloading the files. Users can run it directly via VS Code by changing the terminal path to make it easily accessible. If users encounter issues like "file not found," ensure the terminal path is correctly set within VS Code.
+
+- **Ensure Python and Anaconda are Installed:**
+  Make sure to have Python and Anaconda installed.
+
+- **Internet Connection Required:**
+  Internet connection is required to run the application.
+
 
 Feel free to contribute and enhance the application!

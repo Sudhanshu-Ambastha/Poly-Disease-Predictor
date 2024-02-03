@@ -53,3 +53,6 @@ This project is designed for easy accessibility without downloading the files. U
   This project was created to address challenges faced in earlier models, making it easy to run directly via VS Code, especially when opened through GitHub Desktop. With the presence of necessary files, the project can now be executed seamlessly.
 
 Feel free to contribute and enhance the application!
+
+## Contributors
+@Sudhanshu-Ambastha, @Vishwas567917, @Sarthak966829

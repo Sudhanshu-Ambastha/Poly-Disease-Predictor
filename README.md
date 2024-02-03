@@ -55,4 +55,4 @@ This project is designed for easy accessibility without downloading the files. U
 Feel free to contribute and enhance the application!
 
 ## Contributors
-@Sudhanshu-Ambastha, @Vishwas567917, @Sarthak966829
+[Sudhanshu Ambastha](https://github.com/Sudhanshu-Ambastha), [Sarthak](https://github.com/Sarthak966829), [Vishwas Shrivastava](https://github.com/Vishwas567917)

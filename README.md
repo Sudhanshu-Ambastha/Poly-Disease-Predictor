@@ -55,7 +55,31 @@ This project is designed for easy accessibility without downloading the files. U
 Feel free to contribute and enhance the application!
 
 ## Contributors
-<a href = "https://github.com/Sudhanshu-Ambastha/Poly-Disease-Predictor/contributors">
-  <img src = "https://contrib.rocks/image?repo=Sudhanshu-Ambastha/Poly-Disease-Predictor"/>
-</a>
-
+<table>
+    <tr>
+        <td align="center">
+        <a href="http://github.com/Sudhanshu-Ambastha">
+            <img src="https://avatars.githubusercontent.com/u/135802131?v=4" width="100px;" alt=""/>
+            <br />
+            <sub><b>Sudhanshu Ambastha </b></sub>
+        </a>
+        <br />
+    </td>
+    <td align="center">
+        <a href="https://github.com/Vishwas567917">
+            <img src="https://avatars.githubusercontent.com/u/139749696?s=100&v=4" width="100px;" alt=""/>
+            <br />
+            <sub><b>Parth Shrivastava</b></sub>
+        </a>
+        <br />
+    </td>
+    <td align="center">
+        <a href="https://github.com/Sarthak966829">
+            <img src="https://avatars.githubusercontent.com/u/139750289?s=100&v=4" width="100px;" alt=""/>
+            <br />
+            <sub><b>Sarthak Srivastava</b></sub>
+        </a>
+        <br />
+    </td>
+    </tr>
+</table>

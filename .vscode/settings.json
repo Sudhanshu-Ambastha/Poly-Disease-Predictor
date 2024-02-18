@@ -2,5 +2,5 @@
     "python.REPL.enableREPLSmartSend": false
     "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[javascript]": {
-    "editor.defaultFormatter": "esbenp.prettier-vscode"v
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
 }

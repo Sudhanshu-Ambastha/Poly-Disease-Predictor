@@ -131,6 +131,7 @@ zope.interface==6.1
 
 
 StandardScaler
+sklearn.model_selection
 train_test_split
 svc
 RandomForestClassifier

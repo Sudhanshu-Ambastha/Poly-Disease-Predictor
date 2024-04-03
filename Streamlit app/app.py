@@ -1,3 +1,4 @@
+import os
 import streamlit as st
 import pandas as pd
 from sklearn.preprocessing import StandardScaler
@@ -50,8 +51,10 @@ with st.sidebar:
 # Load data
 if selected == "🩸 Diabetes Prediction" or selected == "❤️ Heart Disease Prediction":
     # Load data for diabetes and heart disease prediction
-    diabetes_data = pd.read_csv('C:\\Users\\sudha\\OneDrive\\Documents\\GitHub\\Poly-Disease-Predictor\\Streamlit app\\diabetes.csv')  # Update with your diabetes dataset path
-    heart_disease_data = pd.read_csv('C:\\Users\\sudha\\OneDrive\\Documents\\GitHub\\Poly-Disease-Predictor\\Streamlit app\\heart.csv')  # Update with your heart disease dataset path
+    diabetes_data_path = os.path.join(os.path.dirname(__file__), 'diabetes.csv')
+    diabetes_data = pd.read_csv(diabetes_data_path)
+    heart_disease_data_path = os.path.join(os.path.dirname(__file__), 'heart.csv')
+    heart_disease_data = pd.read_csv(heart_disease_data_path)
 
     # Training SVM model for diabetes prediction
     X_diabetes = diabetes_data.drop(columns='Outcome', axis=1)
@@ -78,8 +81,11 @@ if selected == "🦠 Multiple Disease Prediction":
     st.title("Multiple Disease Prediction using Symptoms")
 
     # Load data for multiple disease prediction
-    train_data = pd.read_csv('C:\\Users\\sudha\\OneDrive\\Documents\\GitHub\\Poly-Disease-Predictor\\Streamlit app\\Training.csv')
-    test_data = pd.read_csv('C:\\Users\\sudha\\OneDrive\\Documents\\GitHub\\Poly-Disease-Predictor\\Streamlit app\\Testing.csv')
+    # Load data for multiple disease prediction
+    train_data_path = os.path.join(os.path.dirname(__file__), 'Training.csv')
+    test_data_path = os.path.join(os.path.dirname(__file__), 'Testing.csv')
+    train_data = pd.read_csv(train_data_path)
+    test_data = pd.read_csv(test_data_path)
 
     # Split data into features and target variable
     features = train_data.drop('prognosis', axis=1)

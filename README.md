@@ -49,7 +49,11 @@ This project is designed for easy accessibility without downloading the files. U
 - **GitHub Repository Link:**
   Access the GitHub repository for Combined Disease Prediction Bot: [Combined Disease Prediction Bot](https://github.com/Sudhanshu-Ambastha/Combined-Disease-Prediction-Bot)
 
-  **Update:**
+**Check out the video related to it**
+
+[![Poly Disease Predictor](https://img.youtube.com/vi/G7AvMkZ0VGM/0.jpg)](https://www.youtube.com/watch?v=G7AvMkZ0VGM&t=1s "Poly Disease Predictor")
+
+**Update:**
   This project was created to address challenges faced in earlier models, making it easy to run directly via VS Code, especially when opened through GitHub Desktop. With the presence of necessary files, the project can now be executed seamlessly.
 
 Please checkout the deployed working model here [Poly Disease Predictor](https://poly-disease-predictor.onrender.com/)

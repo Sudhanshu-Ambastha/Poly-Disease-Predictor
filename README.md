@@ -7,8 +7,8 @@ PolyDisease Predictor is a Streamlit web application that allows users to predic
 **Clone Repository:**
 
 ```bash
-git clone https://github.com/your-username/combined-disease-prediction-test.git
-cd combined-disease-prediction-test
+git clone https://github.com/Sudhanshu-Ambastha/Poly-Disease-Predictor.git
+cd Streamlit app
 ```
 
 ## Run the Application:

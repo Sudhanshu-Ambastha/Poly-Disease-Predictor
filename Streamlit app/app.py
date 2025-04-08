@@ -15,14 +15,14 @@ from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 import joblib
-import pickle  # Import the pickle library
+import pickle  
 
 # --- Define File Paths Using os.path.join ---
 MODEL_FILE_PATH = os.path.join(os.path.dirname(__file__), 'CombinedModel.sav')
 LABEL_ENCODER_PATH = os.path.join(os.path.dirname(__file__), 'label_encoder.sav')
 TRAINING_DATA_PATH = os.path.join(os.path.dirname(__file__), 'Training.csv')
-DIABETES_MODEL_PATH = os.path.join(os.path.dirname(__file__), './DiabetesModel.sav')
-HEART_DISEASE_MODEL_PATH = os.path.join(os.path.dirname(__file__), './HeartModel.sav')
+DIABETES_MODEL_PATH = os.path.join(os.path.dirname(__file__), 'DiabetesModel.sav')
+HEART_DISEASE_MODEL_PATH = os.path.join(os.path.dirname(__file__), 'HeartModel.sav')
 
 # --- Load Trained Combined Model ---
 try:

@@ -11,7 +11,20 @@ git clone https://github.com/Sudhanshu-Ambastha/Poly-Disease-Predictor.git
 cd Streamlit app
 ```
 
-## Run the Application:
+**Install Dependencies:**
+This command is used to generate a `requirements.txt` file based on the packages currently installed in your active Python environment
+
+```
+pip freeze > requirements.txt
+```
+
+The command to install dependencies from a `requirements.txt` file
+
+```
+pip install -r Streamlit\ app/requirements.txt
+```
+
+**Run the Application:**
 
 Open Anaconda Command Prompt and run the following command:
 

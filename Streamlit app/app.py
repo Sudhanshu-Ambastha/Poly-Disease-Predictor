@@ -110,7 +110,7 @@ if selected == "🩸 Diabetes Prediction" or selected == "❤️ Heart Disease P
 # Multiple Disease Prediction Page
 if selected == "🦠 Multiple Disease Prediction":
     st.title("Multiple Disease Prediction using Symptoms")
-    symptoms_input = st.text_area("Enter your symptoms (comma-separated):", placeholder="e.g., Itching, Skin Rash, Nodal Skin Eruptions")
+    symptoms_input = st.text_area("Enter your symptoms (comma-separated):", placeholder="e.g. Itching, Skin Rash, Nodal Skin Eruptions")
     predict_button = st.button("Predict Disease")
 
     if predict_button and symptoms_input:

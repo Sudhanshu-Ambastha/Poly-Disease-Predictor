@@ -29,7 +29,7 @@ pip install -r Streamlit\ app/requirements.txt
 Open Anaconda Command Prompt and run the following command:
 
 ```bash
-& "Path to streamlit.exe" run "Streamlit app\app.py"
+python -m streamlit run "Streamlit app/app.py"
 ```
 
 ## Access the Application:

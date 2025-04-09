@@ -13,7 +13,7 @@ PolyDisease Predictor is a Streamlit web application that allows users to predic
 Open Anaconda Command Prompt and run the following command:
 
 ```bash
-streamlit run "C:\Users\sudha\OneDrive\Documents\GitHub\combined-disease-prediction-test\Streamlit app\app.py"
+streamlit run "Streamlit app\app.py"
 ```
 ## Access the Application:
 Open your web browser and navigate to the provided URL (usually http://localhost:8501).

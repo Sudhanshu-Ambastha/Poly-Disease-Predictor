@@ -102,10 +102,10 @@ Feel free to contribute and enhance the application!
         <br />
     </td>
     <td align="center">
-        <a href="https://github.com/Sarthak966829">
-            <img src="https://avatars.githubusercontent.com/u/139750289?s=100&v=4" width="100px;" alt=""/>
+        <a href="https://github.com/Shrivatsa-Sharan-Garg">
+            <img src="https://avatars.githubusercontent.com/u/179140208?v=4" width="100px;" alt=""/>
             <br />
-            <sub><b>Sarthak Srivastava</b></sub>
+            <sub><b>Shrivatsa Sharan Garg</b></sub>
         </a>
         <br />
     </td>

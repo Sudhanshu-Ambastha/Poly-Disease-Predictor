@@ -5,8 +5,8 @@
 
 version: 2
 updates:
-  - package-ecosystem: "pip" # See documentation for possible values
-    directory: "Streamlit app/" # Location of package manifests
+  - package-ecosystem: "pip"
+    directory: "Streamlit app/"
     schedule:
       interval: "weekly"
     target-branch: "main"

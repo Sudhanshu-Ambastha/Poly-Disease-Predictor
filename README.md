@@ -53,9 +53,11 @@ Click the corresponding button to get the prediction result.
 
 ## Data Sources
 
-Diabetes dataset: Kaggle Diabetes Dataset
-Heart disease dataset: UCI Heart Disease Dataset
-Multiple disease dataset: Custom dataset used for training and testing.
+- Diabetes dataset: Kaggle Diabetes Dataset
+  - [diabetes.csv](https://www.kaggle.com/datasets/akshaydattatraykhare/diabetes-dataset)
+- Heart disease dataset: Kaggle Heart Disease Dataset
+  - [heart.csv](https://www.kaggle.com/code/desalegngeb/heart-disease-predictions/input)
+- Multiple disease dataset: Custom dataset used for training and testing.
 
 ## Note
 

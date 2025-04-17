@@ -109,7 +109,7 @@ Feel free to contribute and enhance the application!
             <br />
             <sub><b>Shrivatsa Sharan Garg</b></sub>
         </a>
-        <br />
+        <br/>
     </td>
     </tr>
 </table>

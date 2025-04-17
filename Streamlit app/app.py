@@ -8,6 +8,29 @@ import mysql.connector
 from mysql.connector import errorcode
 from datetime import datetime
 
+def set_bg_from_url(url, opacity=1):
+    st.markdown(
+        f"""
+        <style>
+            body {{
+                background: url('{url}') no-repeat center center fixed;
+                background-size: cover;
+                opacity: 0.875;
+            }}
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+
+# --- MUST BE THE FIRST STREAMLIT COMMAND ---
+st.set_page_config(page_title="Multiple Disease Prediction App")
+
+# Set background image from URL
+set_bg_from_url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQB5z1mX8yxvSR0LwZscejLXVDU-_nCS5AYCA&s")
+
+
+
 # --- Define File Paths ---
 MODEL_FILE_PATH = os.path.join(os.path.dirname(__file__), 'CombinedModel.sav')
 LABEL_ENCODER_PATH = os.path.join(os.path.dirname(__file__), 'label_encoder.sav')
@@ -15,6 +38,7 @@ TRAINING_DATA_PATH = os.path.join(os.path.dirname(__file__), 'Training.csv')
 DIABETES_MODEL_PATH = os.path.join(os.path.dirname(__file__), 'DiabetesModel.sav')
 HEART_DISEASE_MODEL_PATH = os.path.join(os.path.dirname(__file__), 'HeartModel.sav')
 
+@st.cache_resource
 def create_db_connection():
     try:
         connection = mysql.connector.connect(
@@ -267,18 +291,21 @@ with st.sidebar:
     selected = st.radio("Select Predictor", ["🦠 Multiple Disease Prediction", "🩸 Diabetes Prediction", "❤️ Heart Disease Prediction"])
 
 # Multiple Disease Prediction Page
-def add_new_symptom_column(cursor, symptom):
+def add_new_symptom_column(mydb, symptom):
+    """Adds a new symptom column to the feedback_multiple table if it doesn't exist."""
     safe_symptom = ''.join(c if c.isalnum() or c == '_' else '_' for c in symptom)
     try:
-        # Check if the column already exists
-        cursor.execute(f"SHOW COLUMNS FROM feedback_multiple LIKE '{safe_symptom}'")
-        result = cursor.fetchone()
-        if not result:
-            # Add the new column BEFORE the 'prognosis' column
-            cursor.execute(f"ALTER TABLE feedback_multiple ADD COLUMN {safe_symptom} TINYINT(1) DEFAULT 0 AFTER yellow_crust_ooze")
-            print(f"Added new column: {safe_symptom} before prognosis")
-        else:
-            print(f"Column {safe_symptom} already exists.")
+        with mydb.cursor() as mycursor:
+            # Check if the column already exists
+            mycursor.execute(f"SHOW COLUMNS FROM feedback_multiple LIKE '{safe_symptom}'")
+            result = mycursor.fetchone()
+            if not result:
+                # Add the new column BEFORE the 'prognosis' column
+                mycursor.execute(f"ALTER TABLE feedback_multiple ADD COLUMN {safe_symptom} TINYINT(1) DEFAULT 0 AFTER yellow_crust_ooze")
+                mydb.commit()
+                print(f"Added new column: {safe_symptom} before prognosis")
+            else:
+                print(f"Column {safe_symptom} already exists.")
     except mysql.connector.Error as err:
         print(f"Error adding column {safe_symptom}: {err}")
 
@@ -287,6 +314,8 @@ if selected == "🦠 Multiple Disease Prediction":
     symptoms_input = st.text_area("Enter your symptoms (comma-separated):", placeholder="e.g. Itching, Skin Rash, Nodal Skin Eruptions")
     predict_button = st.button("Predict Disease")
 
+    mydb = create_db_connection()  # Corrected function call
+
     if predict_button and symptoms_input:
         if symptoms_input.strip():
             try:
@@ -294,47 +323,45 @@ if selected == "🦠 Multiple Disease Prediction":
                 predicted_disease = predict_diseases(symptoms_input)
                 st.success(f"Predicted Disease: {predicted_disease}")
 
-                # --- User Feedback Section ---
-                mydb = create_db_connection()
                 if mydb and mydb.is_connected():
-                    mycursor = mydb.cursor()
-                    col1, col2 = st.columns(2)
-
                     # Process the input symptoms
                     symptoms_list = [s.strip().lower().replace(' ', '_') for s in symptoms_input.split(',')]
 
                     # Check and add new symptoms as columns
                     for symptom in symptoms_list:
                         if symptom not in features_columns:
-                            add_new_symptom_column(mycursor, symptom)
+                            add_new_symptom_column(mydb, symptom)
                             features_columns.append(symptom)  # Update the features_columns list
+
+                    col1, col2 = st.columns(2)
 
                     with col1:
                         if st.button("👍 Correct", key="correct_multiple"):
                             feedback_data = {'prognosis': predicted_disease, 'user_feedback': True}
                             for col in features_columns:
                                 feedback_data[col] = 1 if col in symptoms_list else 0
-                            columns = ", ".join(feedback_data.keys())
-                            placeholders = ", ".join(["%s"] * len(feedback_data))
-                            sql = f"INSERT INTO feedback_multiple ({columns}) VALUES ({placeholders})"
-                            values = tuple(feedback_data.values())
 
-                            # Debugging: Print SQL and values
-                            print(f"SQL: {sql}")
-                            print(f"Values: {values}")
+                            columns_to_insert = [col for col in feedback_data.keys() if col not in ['id', 'feedback_timestamp']]
+                            columns = ", ".join(columns_to_insert)
+                            placeholders = ", ".join(["%s"] * len(columns_to_insert))
+                            sql = f"INSERT INTO feedback_multiple ({columns}) VALUES ({placeholders})"
+                            values = tuple(feedback_data[col] for col in columns_to_insert)
+
+                            print(f"SQL (Correct): {sql}")
+                            print(f"Values (Correct): {values}")
 
                             try:
-                                mycursor.execute(sql, values)
-                                mydb.commit()  # Ensure the transaction is committed
-                                st.success("Thank you for your feedback!")
-                                st.info(f"Data Added - SQL: {sql}")
-                                st.info(f"Data Added - Values: {values}")
+                                with mydb.cursor() as mycursor:
+                                    mycursor.execute(sql, values)
+                                    mydb.commit()
+                                    st.success("Thank you for your feedback!")
+                                    st.info(f"Data Added - SQL: {sql}")
+                                    st.info(f"Data Added - Values: {values}")
                             except mysql.connector.Error as err:
                                 st.error(f"Error inserting feedback: {err}")
-                                print(f"SQL: {sql}")
-                                print(f"Values: {values}")
-                            finally:
-                                mycursor.close()
+                                print(f"SQL (Error - Correct): {sql}")
+                                print(f"Values (Error - Correct): {values}")
+
                     with col2:
                         if st.button("👎 Incorrect", key="incorrect_multiple"):
                             st.warning("Thank you for your feedback. Please tell us the correct disease if you know it:")
@@ -346,30 +373,29 @@ if selected == "🦠 Multiple Disease Prediction":
                                 }
                                 for col in features_columns:
                                     feedback_data[col] = 1 if col in symptoms_list else 0
-                                columns = ", ".join(feedback_data.keys())
-                                placeholders = ", ".join(["%s"] * len(feedback_data))
-                                sql = f"INSERT INTO feedback_multiple ({columns}) VALUES ({placeholders})"
-                                values = tuple(feedback_data.values())
 
-                                # Debugging: Print SQL and values
-                                print(f"SQL: {sql}")
-                                print(f"Values: {values}")
+                                columns_to_insert = [col for col in feedback_data.keys() if col not in ['id', 'feedback_timestamp']]
+                                columns = ", ".join(columns_to_insert)
+                                placeholders = ", ".join(["%s"] * len(columns_to_insert))
+                                sql = f"INSERT INTO feedback_multiple ({columns}) VALUES ({placeholders})"
+                                values = tuple(feedback_data[col] for col in columns_to_insert)
+
+                                print(f"SQL (Incorrect): {sql}")
+                                print(f"Values (Incorrect): {values}")
 
                                 try:
-                                    mycursor.execute(sql, values)
-                                    mydb.commit()  # Ensure the transaction is committed
-                                    st.info("Thank you for the corrected information!")
-                                    st.info(f"Data Added - SQL: {sql}")
-                                    st.info(f"Data Added - Values: {values}")
+                                    with mydb.cursor() as mycursor:
+                                        mycursor.execute(sql, values)
+                                        mydb.commit()
+                                        st.info("Thank you for the corrected information!")
+                                        st.info(f"Data Added - SQL: {sql}")
+                                        st.info(f"Data Added - Values: {values}")
                                 except mysql.connector.Error as err:
                                     st.error(f"Error inserting feedback: {err}")
-                                    print(f"SQL: {sql}")
-                                    print(f"Values: {values}")
-                                finally:
-                                    mycursor.close()
-                    mydb.close()
-                else:
-                    st.error("Failed to connect to the database for feedback.")
+                                    print(f"SQL (Error - Incorrect): {sql}")
+                                    print(f"Values (Error - Incorrect): {values}")
+                elif mydb is None:
+                    st.error("Database connection failed.")
 
             except Exception as e:
                 st.error(f"An error occurred during prediction: {e}")

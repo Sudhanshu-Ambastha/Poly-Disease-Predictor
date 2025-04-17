@@ -83,7 +83,7 @@ Please checkout the deployed working model here [Poly Disease Predictor](https:/
 
 Feel free to contribute and enhance the application!
 
-For contributors looking to integrate a MySQL backend, please refer to the `[tomlStruct.txt](./.streamlit/tomlStruct.txt)` file for the expected structure of the TOML configuration file required for database connection details
+For contributors looking to integrate a MySQL backend, please refer to the [`tomlStruct.txt`](./.streamlit/tomlStruct.txt) file for the expected structure of the TOML configuration file required for database connection details
 
 ## Contributors
 

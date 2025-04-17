@@ -7,16 +7,29 @@ PolyDisease Predictor is a Streamlit web application that allows users to predic
 **Clone Repository:**
 
 ```bash
-git clone https://github.com/your-username/combined-disease-prediction-test.git
-cd combined-disease-prediction-test
+git clone https://github.com/Sudhanshu-Ambastha/Poly-Disease-Predictor.git
+cd Streamlit app
 ```
 
-## Run the Application:
+**Install Dependencies:**
+This command is used to generate a `requirements.txt` file based on the packages currently installed in your active Python environment
+
+```
+pip freeze > requirements.txt
+```
+
+The command to install dependencies from a `requirements.txt` file
+
+```
+pip install -r Streamlit\ app/requirements.txt
+```
+
+**Run the Application:**
 
 Open Anaconda Command Prompt and run the following command:
 
 ```bash
-streamlit run "Streamlit app\app.py"
+python -m streamlit run "Streamlit app/app.py"
 ```
 
 ## Access the Application:
@@ -27,10 +40,8 @@ Open your web browser and navigate to the provided URL (usually http://localhost
 
 Diabetes Prediction
 Predicts whether a person is diabetic or not based on provided health parameters.
-
 Heart Disease Prediction
 Predicts whether a person has heart disease or not based on cardiovascular health parameters.
-
 Multiple Disease Prediction
 Predicts multiple diseases using symptoms provided by the user.
 
@@ -42,11 +53,9 @@ Click the corresponding button to get the prediction result.
 
 ## Data Sources
 
-- Diabetes dataset: Kaggle Diabetes Dataset
-  - [diabetes.csv](https://www.kaggle.com/datasets/akshaydattatraykhare/diabetes-dataset)
-- Heart disease dataset: Kaggle Heart Disease Dataset
-  - [heart.csv](https://www.kaggle.com/code/desalegngeb/heart-disease-predictions/input)
-- Multiple disease dataset: Custom dataset used for training and testing.
+Diabetes dataset: Kaggle Diabetes Dataset
+Heart disease dataset: UCI Heart Disease Dataset
+Multiple disease dataset: Custom dataset used for training and testing.
 
 ## Note
 
@@ -68,37 +77,21 @@ This project is designed for easy accessibility without downloading the files. U
 **Update:**
 This project was created to address challenges faced in earlier models, making it easy to run directly via VS Code, especially when opened through GitHub Desktop. With the presence of necessary files, the project can now be executed seamlessly.
 
-Please check out the deployed working model here [Poly Disease Predictor](https://poly-disease-predictor.onrender.com/)
+Please checkout the deployed working model here [Poly Disease Predictor](https://poly-disease-predictor.onrender.com/)
 
 Feel free to contribute and enhance the application!
 
 ## Contributors
 
 <table>
-<tr>
-<td align="center">
-<a href="http://github.com/Sudhanshu-Ambastha">
-<img src="https://avatars.githubusercontent.com/u/135802131?v=4" width="100px;" alt=""/>
-<br />
-<sub><b>Sudhanshu Ambastha </b></sub>
-</a>
-<br />
-</td>
-<td align="center">
-<a href="https://github.com/Vishwas567917">
-<img src="https://avatars.githubusercontent.com/u/139749696?s=100&v=4" width="100px;" alt=""/>
-<br />
-<sub><b>Path Shrivastava</b></sub>
-</a>
-<br />
-</td>
-<td align="center">
-<a href="https://github.com/Sarthak966829">
-<img src="https://avatars.githubusercontent.com/u/139750289?s=100&v=4" width="100px;" alt=""/>
-<br />
-<sub><b>Sarthak Srivastava</b></sub>
-</a>
-<br />
-</td>
-</tr>
+    <tr>
+        <td align="center">
+        <a href="http://github.com/Sudhanshu-Ambastha">
+            <img src="https://avatars.githubusercontent.com/u/135802131?v=4" width="100px;" alt=""/>
+            <br />
+            <sub><b>Sudhanshu Ambastha </b></sub>
+        </a>
+        <br />
+    </td>
+    </tr>
 </table>

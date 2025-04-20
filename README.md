@@ -8,7 +8,10 @@ PolyDisease Predictor is a Streamlit web application that allows users to predic
 
 ```bash
 git clone https://github.com/Sudhanshu-Ambastha/Poly-Disease-Predictor.git
-cd Streamlit app
+```
+
+```
+cd Streamlit_app
 ```
 
 **Install Dependencies:**
@@ -21,7 +24,7 @@ pip freeze > requirements.txt
 The command to install dependencies from a `requirements.txt` file
 
 ```
-pip install -r Streamlit\ app/requirements.txt
+pip install -r Streamlit_app/requirements.txt
 ```
 
 **Run the Application:**
@@ -29,7 +32,7 @@ pip install -r Streamlit\ app/requirements.txt
 Open Anaconda Command Prompt and run the following command:
 
 ```bash
-python -m streamlit run "Streamlit app/app.py"
+python -m streamlit run "Streamlit_app/app.py"
 ```
 
 ## Access the Application:

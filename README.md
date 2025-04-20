@@ -100,21 +100,5 @@ For contributors looking to integrate a MySQL backend, please refer to the [`tom
         </a>
         <br />
     </td>
-    <td align="center">
-        <a href="https://github.com/Vishwas567917">
-            <img src="https://avatars.githubusercontent.com/u/139749696?s=100&v=4" width="100px;" alt=""/>
-            <br />
-            <sub><b>Parth Shrivastava</b></sub>
-        </a>
-        <br />
-    </td>
-    <td align="center">
-        <a href="https://github.com/Shrivatsa-Sharan-Garg">
-            <img src="https://avatars.githubusercontent.com/u/179140208?v=4" width="100px;" alt=""/>
-            <br />
-            <sub><b>Shrivatsa Sharan Garg</b></sub>
-        </a>
-        <br/>
-    </td>
     </tr>
 </table>

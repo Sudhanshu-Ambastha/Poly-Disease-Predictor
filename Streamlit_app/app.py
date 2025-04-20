@@ -243,7 +243,6 @@ def create_db_connection():
         print(f"Error connecting to MySQL: {err}")
         return None
 
-
 # --- Load Trained Combined Model ---
 try:
     combined_model = joblib.load(MODEL_FILE_PATH)
@@ -335,13 +334,13 @@ with st.sidebar:
 # Multiple Disease Prediction Page
 if selected == "🦠 Multiple Disease Prediction":
     st.title("Multiple Disease Prediction using Symptoms")
+
     symptoms_input = st.text_area("Enter your symptoms (comma-separated):", placeholder="e.g. Itching, Skin Rash, Nodal Skin Eruptions")
     predict_button = st.button("Predict Disease")
 
     mydb = create_db_connection()
     if mydb.is_connected():
         st.success("Database connection successful (test)!")
-        # mydb.close()
     else:
         st.error("Database connection failed (test).")
 
@@ -384,8 +383,10 @@ if selected == "🦠 Multiple Disease Prediction":
 
             except Exception as e:
                 st.error(f"An error occurred during prediction: {e}")
+                st.stop()
         else:
             st.warning("Please enter some symptoms.")
+            st.stop()
 
     # Display the feedback data
     if st.session_state['feedback_data']:
@@ -393,10 +394,16 @@ if selected == "🦠 Multiple Disease Prediction":
         column_names = [desc[0] for desc in mydb.cursor().description] # Get column names
         df_feedback = pd.DataFrame(st.session_state['feedback_data'], columns=column_names)
         st.dataframe(df_feedback)
+        mydb.close()
 
 # Diabetes Prediction Page
 if selected == "🩸 Diabetes Prediction":
     st.title("Diabetes Prediction using ML")
+    mydb = create_db_connection()
+    if mydb.is_connected():
+        st.success("Database connection successful (test)!")
+    else:
+        st.error("Database connection failed (test).")
     
     try:
         diabetes_model = pickle.load(open(DIABETES_MODEL_PATH, 'rb'))
@@ -417,7 +424,6 @@ if selected == "🩸 Diabetes Prediction":
             st.success(diab_diagnosis)
 
             # --- User Feedback Section for Diabetes ---
-            mydb = create_db_connection()
             if mydb and mydb.is_connected():
                 mycursor = mydb.cursor()
                 col1, col2 = st.columns(2)
@@ -461,13 +467,6 @@ if selected == "🩸 Diabetes Prediction":
                     else:
                         st.error("Failed to connect to the database for feedback.")
                 mydb.close()
-                
-                mydb = create_db_connection()
-                if mydb.is_connected():
-                    st.success("Database connection successful (test)!")
-                    # mydb.close()
-                else:
-                    st.error("Database connection failed (test).")
 
             elif mydb is None:
                 st.error("Failed to connect to the database for feedback.")
@@ -480,6 +479,13 @@ if selected == "🩸 Diabetes Prediction":
 # Heart Disease Prediction Page
 if selected == "❤️ Heart Disease Prediction":
     st.title("Heart Disease Prediction using ML")
+
+    mydb = create_db_connection()
+    if mydb.is_connected():
+        st.success("Database connection successful (test)!")
+        # mydb.close()
+    else:
+        st.error("Database connection failed (test).")
 
     try:
         heart_disease_model = pickle.load(open(HEART_DISEASE_MODEL_PATH, 'rb'))
@@ -549,13 +555,6 @@ if selected == "❤️ Heart Disease Prediction":
                     else:
                         st.error("Failed to connect to the database for feedback.")
                 mydb.close()
-                
-                mydb = create_db_connection()
-                if mydb.is_connected():
-                    st.success("Database connection successful (test)!")
-                    # mydb.close()
-                else:
-                    st.error("Database connection failed (test).")
 
             elif mydb is None:
                 st.error("Failed to connect to the database for feedback.")

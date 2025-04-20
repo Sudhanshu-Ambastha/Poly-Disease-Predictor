@@ -18,6 +18,7 @@ fonttools==4.57.0
 fsspec==2025.3.1
 gitdb==4.0.12
 GitPython==3.1.44
+huggingface-hub==0.29.3
 idna==3.10
 inquirerpy==0.3.4
 ipykernel==6.29.5

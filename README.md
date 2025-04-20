@@ -8,7 +8,10 @@ PolyDisease Predictor is a Streamlit web application that allows users to predic
 
 ```bash
 git clone https://github.com/Sudhanshu-Ambastha/Poly-Disease-Predictor.git
-cd Streamlit app
+```
+
+```
+cd Streamlit_app
 ```
 
 **Install Dependencies:**
@@ -21,7 +24,7 @@ pip freeze > requirements.txt
 The command to install dependencies from a `requirements.txt` file
 
 ```
-pip install -r Streamlit\ app/requirements.txt
+pip install -r Streamlit_app/requirements.txt
 ```
 
 **Run the Application:**
@@ -29,7 +32,7 @@ pip install -r Streamlit\ app/requirements.txt
 Open Anaconda Command Prompt and run the following command:
 
 ```bash
-python -m streamlit run "Streamlit app/app.py"
+python -m streamlit run "Streamlit_app/app.py"
 ```
 
 ## Access the Application:
@@ -53,9 +56,11 @@ Click the corresponding button to get the prediction result.
 
 ## Data Sources
 
-Diabetes dataset: Kaggle Diabetes Dataset
-Heart disease dataset: UCI Heart Disease Dataset
-Multiple disease dataset: Custom dataset used for training and testing.
+- Diabetes dataset: Kaggle Diabetes Dataset
+  - [diabetes.csv](https://www.kaggle.com/datasets/akshaydattatraykhare/diabetes-dataset)
+- Heart disease dataset: Kaggle Heart Disease Dataset
+  - [heart.csv](https://www.kaggle.com/code/desalegngeb/heart-disease-predictions/input)
+- Multiple disease dataset: Custom dataset used for training and testing.
 
 ## Note
 
@@ -81,6 +86,8 @@ Please checkout the deployed working model here [Poly Disease Predictor](https:/
 
 Feel free to contribute and enhance the application!
 
+For contributors looking to integrate a MySQL backend, please refer to the [`tomlStruct.txt`](./.streamlit/tomlStruct.txt) file for the expected structure of the TOML configuration file required for database connection details
+
 ## Contributors
 
 <table>
@@ -92,6 +99,22 @@ Feel free to contribute and enhance the application!
             <sub><b>Sudhanshu Ambastha </b></sub>
         </a>
         <br />
+    </td>
+    <td align="center">
+        <a href="https://github.com/Vishwas567917">
+            <img src="https://avatars.githubusercontent.com/u/139749696?s=100&v=4" width="100px;" alt=""/>
+            <br />
+            <sub><b>Parth Shrivastava</b></sub>
+        </a>
+        <br />
+    </td>
+    <td align="center">
+        <a href="https://github.com/Shrivatsa-Sharan-Garg">
+            <img src="https://avatars.githubusercontent.com/u/179140208?v=4" width="100px;" alt=""/>
+            <br />
+            <sub><b>Shrivatsa Sharan Garg</b></sub>
+        </a>
+        <br/>
     </td>
     </tr>
 </table>

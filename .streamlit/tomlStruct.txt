@@ -1,0 +1,9 @@
+fileName: "secrets.toml"
+
+file toml structure(copy & paste below content in toml file & update accordingly):-
+[mysql]
+host = "localhost"
+user = "root"
+password = "1234"
+database = "poly_disease_predictor"
+port= "1234"

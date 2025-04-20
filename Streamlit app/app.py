@@ -46,6 +46,7 @@ def create_db_connection():
             user=st.secrets["mysql"]["user"],
             password=st.secrets["mysql"]["password"],
             # database=st.secrets["mysql"].get("database", None)
+            port=st.secrets["mysql"]["port"],
         )
         if connection.is_connected():
             cursor = connection.cursor()
@@ -56,16 +57,16 @@ def create_db_connection():
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS feedback_diabetes (
                     id INT AUTO_INCREMENT PRIMARY KEY,
-                    pregnancies INT,
-                    glucose INT,
-                    blood_pressure INT,
-                    skin_thickness INT,
-                    insulin INT,
-                    bmi FLOAT,
-                    diabetes_pedigree_function FLOAT,
-                    age INT,
+                    pregnancies INT NOT NULL,
+                    glucose INT NOT NULL,
+                    blood_pressure INT NOT NULL,
+                    skin_thickness INT NOT NULL,
+                    insulin INT NOT NULL,
+                    bmi FLOAT NOT NULL,
+                    diabetes_pedigree_function FLOAT NOT NULL,
+                    age INT NOT NULL,
                     predicted_outcome VARCHAR(255) NOT NULL,
-                    user_feedback BOOLEAN,
+                    user_feedback BOOLEAN NOT NULL DEFAULT 0, 
                     feedback_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
@@ -73,21 +74,21 @@ def create_db_connection():
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS feedback_heart (
                     id INT AUTO_INCREMENT PRIMARY KEY,
-                    age INT,
-                    sex INT,
-                    cp INT,
-                    trestbps INT,
-                    chol INT,
-                    fbs INT,
-                    restecg INT,
-                    thalach INT,
-                    exang INT,
-                    oldpeak FLOAT,
-                    slope INT,
-                    ca INT,
-                    thal INT,
+                    age INT NOT NULL,
+                    sex BOOLEAN NOT NULL DEFAULT 0,
+                    cp INT NOT NULL,
+                    trestbps INT NOT NULL,
+                    chol INT NOT NULL,
+                    fbs INT NOT NULL,
+                    restecg INT NOT NULL,
+                    thalach INT NOT NULL,
+                    exang INT NOT NULL,
+                    oldpeak FLOAT NOT NULL,
+                    slope INT NOT NULL,
+                    ca INT NOT NULL,
+                    thal INT NOT NULL,
                     predicted_outcome VARCHAR(255),
-                    user_feedback BOOLEAN,
+                    user_feedback BOOLEAN NOT NULL DEFAULT 0, 
                     feedback_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 )
             """)
@@ -95,139 +96,139 @@ def create_db_connection():
             cursor.execute("""
                 CREATE TABLE IF NOT EXISTS feedback_multiple (
                     id INT NOT NULL AUTO_INCREMENT PRIMARY KEY,
-                    itching BOOLEAN,
-                    skin_rash TINYINT(1) DEFAULT 0,
-                    nodal_skin_eruptions TINYINT(1) DEFAULT 0,
-                    continuous_sneezing TINYINT(1) DEFAULT 0, 
-                    shivering TINYINT(1) DEFAULT 0, 
-                    chills TINYINT(1) DEFAULT 0, 
-                    joint_pain TINYINT(1) DEFAULT 0, 
-                    stomach_pain TINYINT(1) DEFAULT 0, 
-                    acidity TINYINT(1) DEFAULT 0, 
-                    ulcers_on_tongue TINYINT(1) DEFAULT 0, 
-                    muscle_wasting TINYINT(1) DEFAULT 0, 
-                    vomiting TINYINT(1) DEFAULT 0, 
-                    burning_micturition TINYINT(1) DEFAULT 0, 
-                    spotting_urination TINYINT(1) DEFAULT 0, 
-                    fatigue TINYINT(1) DEFAULT 0, 
-                    weight_gain TINYINT(1) DEFAULT 0, 
-                    anxiety TINYINT(1) DEFAULT 0, 
-                    cold_hands_and_feets TINYINT(1) DEFAULT 0, 
-                    mood_swings TINYINT(1) DEFAULT 0, 
-                    weight_loss TINYINT(1) DEFAULT 0, 
-                    restlessness TINYINT(1) DEFAULT 0, 
-                    lethargy TINYINT(1) DEFAULT 0, 
-                    patches_in_throat TINYINT(1) DEFAULT 0, 
-                    irregular_sugar_level TINYINT(1) DEFAULT 0, 
-                    cough TINYINT(1) DEFAULT 0, 
-                    high_fever TINYINT(1) DEFAULT 0, 
-                    sunken_eyes TINYINT(1) DEFAULT 0, 
-                    breathlessness TINYINT(1) DEFAULT 0, 
-                    sweating TINYINT(1) DEFAULT 0, 
-                    dehydration TINYINT(1) DEFAULT 0, 
-                    indigestion TINYINT(1) DEFAULT 0, 
-                    headache TINYINT(1) DEFAULT 0, 
-                    yellowish_skin TINYINT(1) DEFAULT 0, 
-                    dark_urine TINYINT(1) DEFAULT 0, 
-                    nausea TINYINT(1) DEFAULT 0, 
-                    loss_of_appetite TINYINT(1) DEFAULT 0, 
-                    pain_behind_the_eyes TINYINT(1) DEFAULT 0, 
-                    back_pain TINYINT(1) DEFAULT 0, 
-                    constipation TINYINT(1) DEFAULT 0, 
-                    abdominal_pain TINYINT(1) DEFAULT 0, 
-                    diarrhoea TINYINT(1) DEFAULT 0, 
-                    mild_fever TINYINT(1) DEFAULT 0, 
-                    yellow_urine TINYINT(1) DEFAULT 0, 
-                    yellowing_of_eyes TINYINT(1) DEFAULT 0, 
-                    acute_liver_failure TINYINT(1) DEFAULT 0, 
-                    fluid_overload TINYINT(1) DEFAULT 0, 
-                    swelling_of_stomach TINYINT(1) DEFAULT 0, 
-                    swelled_lymph_nodes TINYINT(1) DEFAULT 0, 
-                    malaise TINYINT(1) DEFAULT 0, 
-                    blurred_and_distorted_vision TINYINT(1) DEFAULT 0, 
-                    phlegm TINYINT(1) DEFAULT 0, 
-                    throat_irritation TINYINT(1) DEFAULT 0, 
-                    redness_of_eyes TINYINT(1) DEFAULT 0, 
-                    sinus_pressure TINYINT(1) DEFAULT 0, 
-                    runny_nose TINYINT(1) DEFAULT 0, 
-                    congestion TINYINT(1) DEFAULT 0, 
-                    chest_pain TINYINT(1) DEFAULT 0, 
-                    weakness_in_limbs TINYINT(1) DEFAULT 0, 
-                    fast_heart_rate TINYINT(1) DEFAULT 0, 
-                    pain_during_bowel_movements TINYINT(1) DEFAULT 0, 
-                    pain_in_anal_region TINYINT(1) DEFAULT 0, 
-                    bloody_stool TINYINT(1) DEFAULT 0, 
-                    irritation_in_anus TINYINT(1) DEFAULT 0, 
-                    neck_pain TINYINT(1) DEFAULT 0, 
-                    dizziness TINYINT(1) DEFAULT 0, 
-                    cramps TINYINT(1) DEFAULT 0, 
-                    bruising TINYINT(1) DEFAULT 0, 
-                    obesity TINYINT(1) DEFAULT 0, 
-                    swollen_legs TINYINT(1) DEFAULT 0, 
-                    swollen_blood_vessels TINYINT(1) DEFAULT 0, 
-                    puffy_face_and_eyes TINYINT(1) DEFAULT 0, 
-                    enlarged_thyroid TINYINT(1) DEFAULT 0, 
-                    brittle_nails TINYINT(1) DEFAULT 0, 
-                    swollen_extremeties TINYINT(1) DEFAULT 0, 
-                    excessive_hunger TINYINT(1) DEFAULT 0, 
-                    extra_marital_contacts TINYINT(1) DEFAULT 0, 
-                    drying_and_tingling_lips TINYINT(1) DEFAULT 0, 
-                    slurred_speech TINYINT(1) DEFAULT 0, 
-                    knee_pain TINYINT(1) DEFAULT 0, 
-                    hip_joint_pain TINYINT(1) DEFAULT 0, 
-                    muscle_weakness TINYINT(1) DEFAULT 0, 
-                    stiff_neck TINYINT(1) DEFAULT 0, 
-                    swelling_joints TINYINT(1) DEFAULT 0, 
-                    movement_stiffness TINYINT(1) DEFAULT 0, 
-                    spinning_movements TINYINT(1) DEFAULT 0, 
-                    loss_of_balance TINYINT(1) DEFAULT 0, 
-                    unsteadiness TINYINT(1) DEFAULT 0, 
-                    weakness_of_one_body_side TINYINT(1) DEFAULT 0, 
-                    loss_of_smell TINYINT(1) DEFAULT 0, 
-                    bladder_discomfort TINYINT(1) DEFAULT 0, 
-                    foul_smell_of_urine TINYINT(1) DEFAULT 0, 
-                    continuous_feel_of_urine TINYINT(1) DEFAULT 0, 
-                    passage_of_gases TINYINT(1) DEFAULT 0, 
-                    internal_itching TINYINT(1) DEFAULT 0, 
-                    toxic_look_typhos TINYINT(1) DEFAULT 0, 
-                    depression TINYINT(1) DEFAULT 0, 
-                    irritability TINYINT(1) DEFAULT 0, 
-                    muscle_pain TINYINT(1) DEFAULT 0, 
-                    altered_sensorium TINYINT(1) DEFAULT 0, 
-                    red_spots_over_body TINYINT(1) DEFAULT 0, 
-                    belly_pain TINYINT(1) DEFAULT 0, 
-                    abnormal_menstruation TINYINT(1) DEFAULT 0, 
-                    dischromic_patches TINYINT(1) DEFAULT 0, 
-                    watering_from_eyes TINYINT(1) DEFAULT 0, 
-                    increased_appetite TINYINT(1) DEFAULT 0, 
-                    polyuria TINYINT(1) DEFAULT 0, 
-                    family_history TINYINT(1) DEFAULT 0, 
-                    mucoid_sputum TINYINT(1) DEFAULT 0, 
-                    rusty_sputum TINYINT(1) DEFAULT 0, 
-                    lack_of_concentration TINYINT(1) DEFAULT 0, 
-                    visual_disturbances TINYINT(1) DEFAULT 0, 
-                    receiving_blood_transfusion TINYINT(1) DEFAULT 0, 
-                    receiving_unsterile_injections TINYINT(1) DEFAULT 0, 
-                    coma TINYINT(1) DEFAULT 0, 
-                    stomach_bleeding TINYINT(1) DEFAULT 0, 
-                    distention_of_abdomen TINYINT(1) DEFAULT 0, 
-                    history_of_alcohol_consumption TINYINT(1) DEFAULT 0, 
-                    blood_in_sputum TINYINT(1) DEFAULT 0, 
-                    prominent_veins_on_calf TINYINT(1) DEFAULT 0, 
-                    palpitations TINYINT(1) DEFAULT 0, 
-                    painful_walking TINYINT(1) DEFAULT 0, 
-                    pus_filled_pimples TINYINT(1) DEFAULT 0, 
-                    blackheads TINYINT(1) DEFAULT 0, 
-                    scurring TINYINT(1) DEFAULT 0, 
-                    skin_peeling TINYINT(1) DEFAULT 0, 
-                    silver_like_dusting TINYINT(1) DEFAULT 0, 
-                    small_dents_in_nails TINYINT(1) DEFAULT 0, 
-                    inflammatory_nails TINYINT(1) DEFAULT 0, 
-                    blister TINYINT(1) DEFAULT 0, 
-                    red_sore_around_nose TINYINT(1) DEFAULT 0, 
-                    yellow_crust_ooze TINYINT(1) DEFAULT 0, 
+                    itching BOOLEAN NOT NULL DEFAULT 0, 
+                    skin_rash BOOLEAN NOT NULL DEFAULT 0, 
+                    nodal_skin_eruptions BOOLEAN NOT NULL DEFAULT 0, 
+                    continuous_sneezing BOOLEAN NOT NULL DEFAULT 0,  
+                    shivering BOOLEAN NOT NULL DEFAULT 0,  
+                    chills BOOLEAN NOT NULL DEFAULT 0,  
+                    joint_pain BOOLEAN NOT NULL DEFAULT 0,  
+                    stomach_pain BOOLEAN NOT NULL DEFAULT 0,  
+                    acidity BOOLEAN NOT NULL DEFAULT 0,  
+                    ulcers_on_tongue BOOLEAN NOT NULL DEFAULT 0,  
+                    muscle_wasting BOOLEAN NOT NULL DEFAULT 0,  
+                    vomiting BOOLEAN NOT NULL DEFAULT 0,  
+                    burning_micturition BOOLEAN NOT NULL DEFAULT 0,  
+                    spotting_urination BOOLEAN NOT NULL DEFAULT 0,  
+                    fatigue BOOLEAN NOT NULL DEFAULT 0,  
+                    weight_gain BOOLEAN NOT NULL DEFAULT 0,  
+                    anxiety BOOLEAN NOT NULL DEFAULT 0,  
+                    cold_hands_and_feets BOOLEAN NOT NULL DEFAULT 0,  
+                    mood_swings BOOLEAN NOT NULL DEFAULT 0,  
+                    weight_loss BOOLEAN NOT NULL DEFAULT 0,  
+                    restlessness BOOLEAN NOT NULL DEFAULT 0,  
+                    lethargy BOOLEAN NOT NULL DEFAULT 0,  
+                    patches_in_throat BOOLEAN NOT NULL DEFAULT 0,  
+                    irregular_sugar_level BOOLEAN NOT NULL DEFAULT 0,  
+                    cough BOOLEAN NOT NULL DEFAULT 0,  
+                    high_fever BOOLEAN NOT NULL DEFAULT 0,  
+                    sunken_eyes BOOLEAN NOT NULL DEFAULT 0,  
+                    breathlessness BOOLEAN NOT NULL DEFAULT 0,  
+                    sweating BOOLEAN NOT NULL DEFAULT 0,  
+                    dehydration BOOLEAN NOT NULL DEFAULT 0,  
+                    indigestion BOOLEAN NOT NULL DEFAULT 0,  
+                    headache BOOLEAN NOT NULL DEFAULT 0,  
+                    yellowish_skin BOOLEAN NOT NULL DEFAULT 0,  
+                    dark_urine BOOLEAN NOT NULL DEFAULT 0,  
+                    nausea BOOLEAN NOT NULL DEFAULT 0,  
+                    loss_of_appetite BOOLEAN NOT NULL DEFAULT 0,  
+                    pain_behind_the_eyes BOOLEAN NOT NULL DEFAULT 0,  
+                    back_pain BOOLEAN NOT NULL DEFAULT 0,  
+                    constipation BOOLEAN NOT NULL DEFAULT 0,  
+                    abdominal_pain BOOLEAN NOT NULL DEFAULT 0,  
+                    diarrhoea BOOLEAN NOT NULL DEFAULT 0,  
+                    mild_fever BOOLEAN NOT NULL DEFAULT 0,  
+                    yellow_urine BOOLEAN NOT NULL DEFAULT 0,  
+                    yellowing_of_eyes BOOLEAN NOT NULL DEFAULT 0,  
+                    acute_liver_failure BOOLEAN NOT NULL DEFAULT 0,  
+                    fluid_overload BOOLEAN NOT NULL DEFAULT 0,  
+                    swelling_of_stomach BOOLEAN NOT NULL DEFAULT 0,  
+                    swelled_lymph_nodes BOOLEAN NOT NULL DEFAULT 0,  
+                    malaise BOOLEAN NOT NULL DEFAULT 0,  
+                    blurred_and_distorted_vision BOOLEAN NOT NULL DEFAULT 0,  
+                    phlegm BOOLEAN NOT NULL DEFAULT 0,  
+                    throat_irritation BOOLEAN NOT NULL DEFAULT 0,  
+                    redness_of_eyes BOOLEAN NOT NULL DEFAULT 0,  
+                    sinus_pressure BOOLEAN NOT NULL DEFAULT 0,  
+                    runny_nose BOOLEAN NOT NULL DEFAULT 0,  
+                    congestion BOOLEAN NOT NULL DEFAULT 0,  
+                    chest_pain BOOLEAN NOT NULL DEFAULT 0,  
+                    weakness_in_limbs BOOLEAN NOT NULL DEFAULT 0,  
+                    fast_heart_rate BOOLEAN NOT NULL DEFAULT 0,  
+                    pain_during_bowel_movements BOOLEAN NOT NULL DEFAULT 0,  
+                    pain_in_anal_region BOOLEAN NOT NULL DEFAULT 0,  
+                    bloody_stool BOOLEAN NOT NULL DEFAULT 0,  
+                    irritation_in_anus BOOLEAN NOT NULL DEFAULT 0,  
+                    neck_pain BOOLEAN NOT NULL DEFAULT 0,  
+                    dizziness BOOLEAN NOT NULL DEFAULT 0,  
+                    cramps BOOLEAN NOT NULL DEFAULT 0,  
+                    bruising BOOLEAN NOT NULL DEFAULT 0,  
+                    obesity BOOLEAN NOT NULL DEFAULT 0,  
+                    swollen_legs BOOLEAN NOT NULL DEFAULT 0,  
+                    swollen_blood_vessels BOOLEAN NOT NULL DEFAULT 0,  
+                    puffy_face_and_eyes BOOLEAN NOT NULL DEFAULT 0,  
+                    enlarged_thyroid BOOLEAN NOT NULL DEFAULT 0,  
+                    brittle_nails BOOLEAN NOT NULL DEFAULT 0,  
+                    swollen_extremeties BOOLEAN NOT NULL DEFAULT 0,  
+                    excessive_hunger BOOLEAN NOT NULL DEFAULT 0,  
+                    extra_marital_contacts BOOLEAN NOT NULL DEFAULT 0,  
+                    drying_and_tingling_lips BOOLEAN NOT NULL DEFAULT 0,  
+                    slurred_speech BOOLEAN NOT NULL DEFAULT 0,  
+                    knee_pain BOOLEAN NOT NULL DEFAULT 0,  
+                    hip_joint_pain BOOLEAN NOT NULL DEFAULT 0,  
+                    muscle_weakness BOOLEAN NOT NULL DEFAULT 0,  
+                    stiff_neck BOOLEAN NOT NULL DEFAULT 0,  
+                    swelling_joints BOOLEAN NOT NULL DEFAULT 0,  
+                    movement_stiffness BOOLEAN NOT NULL DEFAULT 0,  
+                    spinning_movements BOOLEAN NOT NULL DEFAULT 0,  
+                    loss_of_balance BOOLEAN NOT NULL DEFAULT 0,  
+                    unsteadiness BOOLEAN NOT NULL DEFAULT 0,  
+                    weakness_of_one_body_side BOOLEAN NOT NULL DEFAULT 0,  
+                    loss_of_smell BOOLEAN NOT NULL DEFAULT 0,  
+                    bladder_discomfort BOOLEAN NOT NULL DEFAULT 0,  
+                    foul_smell_of_urine BOOLEAN NOT NULL DEFAULT 0,  
+                    continuous_feel_of_urine BOOLEAN NOT NULL DEFAULT 0,  
+                    passage_of_gases BOOLEAN NOT NULL DEFAULT 0,  
+                    internal_itching BOOLEAN NOT NULL DEFAULT 0,  
+                    toxic_look_typhos BOOLEAN NOT NULL DEFAULT 0,  
+                    depression BOOLEAN NOT NULL DEFAULT 0,  
+                    irritability BOOLEAN NOT NULL DEFAULT 0,  
+                    muscle_pain BOOLEAN NOT NULL DEFAULT 0,  
+                    altered_sensorium BOOLEAN NOT NULL DEFAULT 0,  
+                    red_spots_over_body BOOLEAN NOT NULL DEFAULT 0,  
+                    belly_pain BOOLEAN NOT NULL DEFAULT 0,  
+                    abnormal_menstruation BOOLEAN NOT NULL DEFAULT 0,  
+                    dischromic_patches BOOLEAN NOT NULL DEFAULT 0,  
+                    watering_from_eyes BOOLEAN NOT NULL DEFAULT 0,  
+                    increased_appetite BOOLEAN NOT NULL DEFAULT 0,  
+                    polyuria BOOLEAN NOT NULL DEFAULT 0,  
+                    family_history BOOLEAN NOT NULL DEFAULT 0,  
+                    mucoid_sputum BOOLEAN NOT NULL DEFAULT 0,  
+                    rusty_sputum BOOLEAN NOT NULL DEFAULT 0,  
+                    lack_of_concentration BOOLEAN NOT NULL DEFAULT 0,  
+                    visual_disturbances BOOLEAN NOT NULL DEFAULT 0,  
+                    receiving_blood_transfusion BOOLEAN NOT NULL DEFAULT 0,  
+                    receiving_unsterile_injections BOOLEAN NOT NULL DEFAULT 0,  
+                    coma BOOLEAN NOT NULL DEFAULT 0,  
+                    stomach_bleeding BOOLEAN NOT NULL DEFAULT 0,  
+                    distention_of_abdomen BOOLEAN NOT NULL DEFAULT 0,  
+                    history_of_alcohol_consumption BOOLEAN NOT NULL DEFAULT 0,  
+                    blood_in_sputum BOOLEAN NOT NULL DEFAULT 0,  
+                    prominent_veins_on_calf BOOLEAN NOT NULL DEFAULT 0,  
+                    palpitations BOOLEAN NOT NULL DEFAULT 0,  
+                    painful_walking BOOLEAN NOT NULL DEFAULT 0,  
+                    pus_filled_pimples BOOLEAN NOT NULL DEFAULT 0,  
+                    blackheads BOOLEAN NOT NULL DEFAULT 0,  
+                    scurring BOOLEAN NOT NULL DEFAULT 0,  
+                    skin_peeling BOOLEAN NOT NULL DEFAULT 0,  
+                    silver_like_dusting BOOLEAN NOT NULL DEFAULT 0,  
+                    small_dents_in_nails BOOLEAN NOT NULL DEFAULT 0,  
+                    inflammatory_nails BOOLEAN NOT NULL DEFAULT 0,  
+                    blister BOOLEAN NOT NULL DEFAULT 0,  
+                    red_sore_around_nose BOOLEAN NOT NULL DEFAULT 0,  
+                    yellow_crust_ooze BOOLEAN NOT NULL DEFAULT 0,  
                     prognosis VARCHAR(255) NOT NULL,
-                    user_feedback TINYINT(1) DEFAULT 0, 
+                    user_feedback BOOLEAN NOT NULL DEFAULT 0,  
                     feedback_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
                 );
             """)
@@ -238,7 +239,8 @@ def create_db_connection():
             st.error("Failed to connect to the database.")
             return None
     except mysql.connector.Error as err:
-        st.error(f"Error inserting feedback: {err}")
+        st.error(f"Error connecting to MySQL: {err}")
+        print(f"Error connecting to MySQL: {err}")
         return None
 
 
@@ -273,6 +275,9 @@ except Exception as e:
     st.error(f"An unexpected error occurred while loading 'Training.csv': {e}")
     st.stop()
 
+if 'feedback_data' not in st.session_state:
+    st.session_state['feedback_data'] = []
+
 # Function to predict multiple diseases based on symptoms
 def predict_diseases(symptoms_str):
     symptoms = [s.strip().lower().replace(' ', '_') for s in symptoms_str.split(',')]
@@ -296,25 +301,25 @@ def add_new_symptom_column(mydb, symptom):
             if not result:
                 # Get the last symptom column before 'prognosis'
                 mycursor.execute("""
-                    SELECT COLUMN_NAME 
-                    FROM INFORMATION_SCHEMA.COLUMNS 
-                    WHERE TABLE_NAME = 'feedback_multiple' 
+                    SELECT COLUMN_NAME
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE TABLE_NAME = 'feedback_multiple'
                     AND TABLE_SCHEMA = DATABASE()
                     AND COLUMN_NAME != 'prognosis'
                     AND ORDINAL_POSITION < (
-                        SELECT ORDINAL_POSITION 
-                        FROM INFORMATION_SCHEMA.COLUMNS 
-                        WHERE TABLE_NAME = 'feedback_multiple' 
+                        SELECT ORDINAL_POSITION
+                        FROM INFORMATION_SCHEMA.COLUMNS
+                        WHERE TABLE_NAME = 'feedback_multiple'
                         AND TABLE_SCHEMA = DATABASE()
                         AND COLUMN_NAME = 'prognosis'
                     )
-                    ORDER BY ORDINAL_POSITION DESC 
+                    ORDER BY ORDINAL_POSITION DESC
                     LIMIT 1
                 """)
                 last_symptom = mycursor.fetchone()[0]
-                
+
                 # Add the new column after the last symptom
-                mycursor.execute(f"ALTER TABLE feedback_multiple ADD COLUMN {safe_symptom} TINYINT(1) DEFAULT 0 AFTER {last_symptom}")
+                mycursor.execute(f"ALTER TABLE feedback_multiple ADD COLUMN {safe_symptom} BOOLEAN NOT NULL DEFAULT 0 AFTER {last_symptom}")
                 mydb.commit()
                 print(f"Added new column: {safe_symptom} after {last_symptom}")
             else:
@@ -334,37 +339,11 @@ if selected == "🦠 Multiple Disease Prediction":
     predict_button = st.button("Predict Disease")
 
     mydb = create_db_connection()
-
-    def insert_feedback_multiple(mydb, symptoms_list, predicted_disease, user_feedback, correct_disease=None):
-        """Inserts feedback into the feedback_multiple table."""
-        try:
-            with mydb.cursor() as mycursor:
-                feedback_data = {'prognosis': predicted_disease, 'user_feedback': user_feedback}
-                if correct_disease:
-                    feedback_data['prognosis'] = correct_disease.strip().capitalize()
-
-                for col in features_columns:
-                    feedback_data[col] = 1 if col in symptoms_list else 0
-
-                columns_to_insert = [col for col in feedback_data.keys() if col not in ['id', 'feedback_timestamp']]
-                columns = ", ".join(columns_to_insert)
-                placeholders = ", ".join(["%s"] * len(columns_to_insert))
-                sql = f"INSERT INTO feedback_multiple ({columns}) VALUES ({placeholders})"
-                values = tuple(feedback_data[col] for col in columns_to_insert)
-
-                print(f"SQL (Insert): {sql}")
-                print(f"Values (Insert): {values}")
-
-                mycursor.execute(sql, values)
-                mydb.commit()
-                st.info("Feedback submitted successfully!")
-                st.info(f"Data Added - SQL: {sql}")
-                st.info(f"Data Added - Values: {values}")
-
-        except mysql.connector.Error as err:
-            st.error(f"Error inserting feedback: {err}")
-            print(f"SQL (Error - Insert): {sql}")
-            print(f"Values (Error - Insert): {values}")
+    if mydb.is_connected():
+        st.success("Database connection successful (test)!")
+        # mydb.close()
+    else:
+        st.error("Database connection failed (test).")
 
     if predict_button and symptoms_input:
         if symptoms_input.strip():
@@ -379,18 +358,27 @@ if selected == "🦠 Multiple Disease Prediction":
                         if symptom not in features_columns:
                             add_new_symptom_column(mydb, symptom)
                             features_columns.append(symptom)
+                            print(f"features_columns after adding: {features_columns}")
 
                     col1, col2 = st.columns(2)
 
                     with col1:
                         if st.button("👍 Correct", key="correct_multiple"):
                             insert_feedback_multiple(mydb, symptoms_list, predicted_disease, True)
+                            with mydb.cursor() as mycursor:
+                                mycursor.execute("""SELECT * FROM poly_disease_predictor.feedback_multiple ORDER BY feedback_timestamp DESC LIMIT 5""") # Fetch last 5 entries
+                                st.session_state['feedback_data'] = mycursor.fetchall()
+                                mydb.commit() # Ensure changes are committed before fetching
 
                     with col2:
                         if st.button("👎 Incorrect", key="incorrect_multiple"):
                             correct_disease_input = st.text_input("Correct Disease (optional):", "", key="correct_disease_multiple")
                             if st.button("Submit Correct Disease", key="submit_correct_multiple"):
                                 insert_feedback_multiple(mydb, symptoms_list, predicted_disease, False, correct_disease_input)
+                                with mydb.cursor() as mycursor:
+                                    mycursor.execute("""SELECT * FROM poly_disease_predictor.feedback_multiple ORDER BY feedback_timestamp DESC LIMIT 5""") # Fetch last 5 entries
+                                    st.session_state['feedback_data'] = mycursor.fetchall()
+                                    mydb.commit() # Ensure changes are committed before fetching
                 elif mydb is None:
                     st.error("Database connection failed.")
 
@@ -399,10 +387,17 @@ if selected == "🦠 Multiple Disease Prediction":
         else:
             st.warning("Please enter some symptoms.")
 
+    # Display the feedback data
+    if st.session_state['feedback_data']:
+        st.subheader("Recent Feedback:")
+        column_names = [desc[0] for desc in mydb.cursor().description] # Get column names
+        df_feedback = pd.DataFrame(st.session_state['feedback_data'], columns=column_names)
+        st.dataframe(df_feedback)
+
 # Diabetes Prediction Page
 if selected == "🩸 Diabetes Prediction":
     st.title("Diabetes Prediction using ML")
-
+    
     try:
         diabetes_model = pickle.load(open(DIABETES_MODEL_PATH, 'rb'))
 
@@ -466,6 +461,14 @@ if selected == "🩸 Diabetes Prediction":
                     else:
                         st.error("Failed to connect to the database for feedback.")
                 mydb.close()
+                
+                mydb = create_db_connection()
+                if mydb.is_connected():
+                    st.success("Database connection successful (test)!")
+                    # mydb.close()
+                else:
+                    st.error("Database connection failed (test).")
+
             elif mydb is None:
                 st.error("Failed to connect to the database for feedback.")
 
@@ -546,6 +549,14 @@ if selected == "❤️ Heart Disease Prediction":
                     else:
                         st.error("Failed to connect to the database for feedback.")
                 mydb.close()
+                
+                mydb = create_db_connection()
+                if mydb.is_connected():
+                    st.success("Database connection successful (test)!")
+                    # mydb.close()
+                else:
+                    st.error("Database connection failed (test).")
+
             elif mydb is None:
                 st.error("Failed to connect to the database for feedback.")
     

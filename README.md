@@ -61,6 +61,7 @@ Click the corresponding button to get the prediction result.
 - Heart disease dataset: Kaggle Heart Disease Dataset
   - [heart.csv](https://www.kaggle.com/code/desalegngeb/heart-disease-predictions/input)
 - Multiple disease dataset: Custom dataset used for training and testing.
+[training. csv](https://www.kaggle.com/datasets/kaushil268/disease-prediction-using-machine-learning)
 
 ## Note
 

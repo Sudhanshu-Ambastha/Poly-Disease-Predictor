@@ -61,6 +61,7 @@ Click the corresponding button to get the prediction result.
 - Heart disease dataset: Kaggle Heart Disease Dataset
   - [heart.csv](https://www.kaggle.com/code/desalegngeb/heart-disease-predictions/input)
 - Multiple disease dataset: Custom dataset used for training and testing.
+  - [training. csv](https://www.kaggle.com/datasets/kaushil268/disease-prediction-using-machine-learning)
 
 ## Note
 
@@ -82,7 +83,7 @@ This project is designed for easy accessibility without downloading the files. U
 **Update:**
 This project was created to address challenges faced in earlier models, making it easy to run directly via VS Code, especially when opened through GitHub Desktop. With the presence of necessary files, the project can now be executed seamlessly.
 
-Please checkout the deployed working model here [Poly Disease Predictor](https://poly-disease-predictor.onrender.com/)
+Please checkout the deployed working model here [Poly Disease Predictor](https://poly-disease-predictor.streamlit.app/)
 
 Feel free to contribute and enhance the application!
 
@@ -99,6 +100,22 @@ For contributors looking to integrate a MySQL backend, please refer to the [`tom
             <sub><b>Sudhanshu Ambastha </b></sub>
         </a>
         <br />
+    </td>
+    <td align="center">
+        <a href="https://github.com/Vishwas567917">
+            <img src="https://avatars.githubusercontent.com/u/139749696?s=100&v=4" width="100px;" alt=""/>
+            <br />
+            <sub><b>Parth Shrivastava</b></sub>
+        </a>
+        <br />
+    </td>
+    <td align="center">
+        <a href="https://github.com/Shrivatsa-Sharan-Garg">
+            <img src="https://avatars.githubusercontent.com/u/179140208?v=4" width="100px;" alt=""/>
+            <br />
+            <sub><b>Shrivatsa Sharan Garg</b></sub>
+        </a>
+        <br/>
     </td>
     </tr>
 </table>

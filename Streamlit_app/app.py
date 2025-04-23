@@ -22,16 +22,10 @@ def set_bg_from_url(url, opacity=1):
         unsafe_allow_html=True
     )
 
-
-# --- MUST BE THE FIRST STREAMLIT COMMAND ---
 st.set_page_config(page_title="Multiple Disease Prediction App")
 
-# Set background image from URL
 set_bg_from_url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQB5z1mX8yxvSR0LwZscejLXVDU-_nCS5AYCA&s")
 
-
-
-# --- Define File Paths ---
 MODEL_FILE_PATH = os.path.join(os.path.dirname(__file__), './models/CombinedModel.sav')
 LABEL_ENCODER_PATH = os.path.join(os.path.dirname(__file__), './models/label_encoder.sav')
 TRAINING_DATA_PATH = os.path.join(os.path.dirname(__file__), './models/Training.csv')
@@ -49,11 +43,9 @@ def create_db_connection():
         )
         if connection.is_connected():
             cursor = connection.cursor()
-            # Create the database if it doesn't exist
             cursor.execute("CREATE DATABASE IF NOT EXISTS poly_disease_predictor")
             cursor.execute("USE poly_disease_predictor")
 
-            # Execute SQL files to create tables
             sql_files = [
                 "./sql/create_feedback_diabetes_table.sql",
                 "./sql/create_feedback_heart_table.sql",
@@ -64,7 +56,7 @@ def create_db_connection():
                 try:
                     with open(sql_file_path, 'r') as f:
                         sql_script = f.read()
-                        for statement in sql_script.split(';\n'): # Split by semicolon and newline
+                        for statement in sql_script.split(';\n'):
                             if statement.strip():
                                 cursor.execute(statement)
                     connection.commit()
@@ -73,7 +65,6 @@ def create_db_connection():
                     return None
                 except mysql.connector.Error as err:
                     st.error(f"Error executing SQL from {sql_file}: {err}")
-                    print(f"MySQL Error ({sql_file}): {err}")
                     return None
 
             return connection
@@ -82,10 +73,8 @@ def create_db_connection():
             return None
     except mysql.connector.Error as err:
         st.error(f"Error connecting to MySQL: {err}")
-        print(f"Error connecting to MySQL: {err}")
         return None
 
-# --- Load Trained Combined Model ---
 try:
     combined_model = joblib.load(MODEL_FILE_PATH)
 except FileNotFoundError:
@@ -95,7 +84,6 @@ except Exception as e:
     st.error(f"An unexpected error occurred while loading the combined model: {e}")
     st.stop()
 
-# --- Load Trained LabelEncoder ---
 try:
     label_encoder = joblib.load(LABEL_ENCODER_PATH)
 except FileNotFoundError:
@@ -105,7 +93,6 @@ except Exception as e:
     st.error(f"An unexpected error occurred while loading the LabelEncoder: {e}")
     st.stop()
 
-# --- Load Training Data to Get Features for Multiple Disease Prediction ---
 try:
     train_data = pd.read_csv(TRAINING_DATA_PATH)
     features_columns = train_data.drop('prognosis', axis=1).columns.tolist()
@@ -119,7 +106,6 @@ except Exception as e:
 if 'feedback_data' not in st.session_state:
     st.session_state['feedback_data'] = []
 
-# Function to predict multiple diseases based on symptoms
 def predict_diseases(symptoms_str):
     symptoms = [s.strip().lower().replace(' ', '_') for s in symptoms_str.split(',')]
     input_data = pd.DataFrame(np.zeros((1, len(features_columns)), dtype=int), columns=features_columns)
@@ -136,38 +122,47 @@ def add_new_symptom_column(mydb, symptom):
     safe_symptom = ''.join(c if c.isalnum() or c == '_' else '_' for c in symptom)
     try:
         with mydb.cursor() as mycursor:
-            # Check if the column already exists
-            mycursor.execute(f"SHOW COLUMNS FROM feedback_multiple LIKE '{safe_symptom}'")
+            mycursor.execute(f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'feedback_multiple' AND COLUMN_NAME LIKE '{safe_symptom}'")
             result = mycursor.fetchone()
             if not result:
-                # Read the SQL query from the file to get the last symptom column
-                sql_file_path = os.path.join(os.path.dirname(__file__), 'find_last_symptom_col_before_prognosis.sql')
-                try:
-                    with open(sql_file_path, 'r') as f:
-                        get_last_symptom_sql = f.read()
-                except FileNotFoundError:
-                    print(f"Error: SQL file not found at {sql_file_path}")
-                    return
+                # Fetch the list of existing symptom columns to determine where to add the new one
+                mycursor.execute("""
+                    SELECT COLUMN_NAME
+                    FROM INFORMATION_SCHEMA.COLUMNS
+                    WHERE TABLE_NAME = 'feedback_multiple'
+                    AND COLUMN_NAME NOT IN ('id', 'prognosis', 'user_feedback', 'feedback_timestamp', 'correct_diagnosis')
+                    ORDER BY ORDINAL_POSITION
+                """)
+                symptom_columns_results = mycursor.fetchall()
+                symptom_columns = [res[0] for res in symptom_columns_results]
 
-                mycursor.execute(get_last_symptom_sql)
-                last_symptom_result = mycursor.fetchone()
-
-                if last_symptom_result and last_symptom_result[0]:
-                    last_symptom = last_symptom_result[0]
-                    # Add the new column after the last symptom
-                    mycursor.execute(f"ALTER TABLE feedback_multiple ADD COLUMN {safe_symptom} BOOLEAN NOT NULL DEFAULT 0 AFTER {last_symptom}")
-                    mydb.commit()
-                    print(f"Added new column: {safe_symptom} after {last_symptom}")
+                alter_sql = ""
+                if symptom_columns:
+                    last_symptom = symptom_columns[-1]
+                    alter_sql = f"ALTER TABLE feedback_multiple ADD COLUMN `{safe_symptom}` BOOLEAN NOT NULL DEFAULT 0 AFTER `{last_symptom}`"
                 else:
-                    # Handle the case where there are no symptom columns before 'prognosis'
-                    # Add it after 'id' as a fallback
-                    mycursor.execute(f"ALTER TABLE feedback_multiple ADD COLUMN {safe_symptom} BOOLEAN NOT NULL DEFAULT 0 AFTER id")
+                    alter_sql = f"ALTER TABLE feedback_multiple ADD COLUMN `{safe_symptom}` BOOLEAN NOT NULL DEFAULT 0 AFTER `id`"
+
+                try:
+                    mycursor.execute(alter_sql)
                     mydb.commit()
-                    print(f"Added new column: {safe_symptom} after id (no preceding symptom found).")
+                    print(f"Successfully added column: {safe_symptom}")
+                    return True
+                except mysql.connector.Error as err:
+                    st.error(f"Error altering table to add column '{safe_symptom}': {err}")
+                    print(f"MySQL Error (ALTER TABLE): {err}")
+                    return False
             else:
-                print(f"Column {safe_symptom} already exists.")
+                print(f"Column '{safe_symptom}' already exists.")
+                return True
     except mysql.connector.Error as err:
-        print(f"Error adding column {safe_symptom}: {err}")
+        st.error(f"Error checking for column '{safe_symptom}': {err}")
+        print(f"MySQL Error (SHOW COLUMNS): {err}")
+        return False
+    except Exception as e:
+        st.error(f"An unexpected error occurred while adding column '{safe_symptom}': {e}")
+        print(f"Unexpected Error (add_new_symptom_column): {e}")
+        return False
 
 def insert_feedback_multiple(mydb, symptoms_list, predicted_disease, user_feedback, correct_disease=None):
     if mydb and mydb.is_connected():
@@ -191,33 +186,18 @@ def insert_feedback_multiple(mydb, symptoms_list, predicted_disease, user_feedba
                     sql = f"INSERT INTO feedback_multiple ({', '.join(all_columns)}) VALUES ({all_placeholders})"
                     values_to_insert.append(correct_disease.strip().capitalize())
 
-                st.info(f"Attempting to INSERT into columns: {all_columns}")
-                st.info(f"Attempting to execute SQL: `{sql}` with values: `{values_to_insert}`")
-
-                mycursor.execute(sql, tuple(values_to_insert)) # Execute with a tuple
+                mycursor.execute(sql, tuple(values_to_insert))
                 mydb.commit()
-                st.success("Feedback submitted for multiple disease prediction!")
+                st.success("Feedback submitted!")
 
         except mysql.connector.Error as err:
-            st.error(f"Error inserting feedback for multiple disease: {err}")
-            print(f"MySQL Error (Multiple): {err}")
+            st.error(f"Error inserting feedback: {err}")
         except Exception as e:
-            st.error(f"An unexpected error occurred during multiple disease feedback insertion: {e}")
-            print(f"Unexpected Error (Multiple): {e}")
+            st.error(f"An unexpected error occurred during feedback insertion: {e}")
     else:
-        st.error("Database connection failed for multiple disease feedback.")
+        st.error("Database connection failed for feedback.")
 
 def insert_feedback_diabetes(mydb, table_name, input_features, predicted_outcome, user_feedback):
-    """Inserts feedback into the feedback_diabetes table with detailed logging."""
-    print("--- insert_feedback_diabetes CALLED ---")
-    print(f"Database connection object: {mydb}")
-    if mydb and mydb.is_connected():
-        print("Database connection is active.")
-    else:
-        print("Database connection is NOT active!")
-        st.error("Database connection is not available in insert_feedback_diabetes.")
-        return False
-
     try:
         mycursor = mydb.cursor()
         sql = f"""
@@ -226,49 +206,22 @@ def insert_feedback_diabetes(mydb, table_name, input_features, predicted_outcome
                 predicted_outcome, user_feedback
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
-        values = input_features + [int(predicted_outcome), user_feedback]  # Ensure predicted_outcome is an integer
-
-        print(f"Executing Diabetes Feedback SQL: {sql}")
-        print(f"With values: {values}")
-
+        values = input_features + [int(predicted_outcome), user_feedback]
         mycursor.execute(sql, values)
-        print("mycursor.execute() COMPLETED.")
         mydb.commit()
-        print("mydb.commit() COMPLETED.")
-        print("Successfully inserted diabetes feedback.")
+        st.success("Feedback submitted!")
         return True
     except mysql.connector.Error as err:
-        st.error(f"Error inserting diabetes feedback: {err}")
-        print(f"MySQL Error (Diabetes Feedback): {err}")
-        print(f"SQL: {sql}")
-        print(f"Values: {values}")
+        st.error(f"Error inserting feedback: {err}")
         return False
     except Exception as e:
-        st.error(f"An unexpected error occurred in insert_feedback_diabetes: {e}")
-        print(f"Unexpected Error (Diabetes Feedback): {e}")
-        print(f"SQL: {sql}")
-        print(f"Values: {values}")
+        st.error(f"An unexpected error occurred during feedback insertion: {e}")
         return False
     finally:
         if mycursor:
             mycursor.close()
-            print("mycursor CLOSED.")
-        if mydb and mydb.is_connected():
-            print("Database connection STILL active at the end of function.")
-        else:
-            print("Database connection NOT active at the end of function.")
 
 def insert_feedback_heart(mydb, table_name, input_features, predicted_outcome, user_feedback):
-    """Inserts feedback into the feedback_heart table with detailed logging."""
-    print("--- insert_feedback_heart CALLED ---")
-    print(f"Database connection object: {mydb}")
-    if mydb and mydb.is_connected():
-        print("Database connection is active.")
-    else:
-        print("Database connection is NOT active!")
-        st.error("Database connection is not available in insert_feedback_heart.")
-        return False
-
     try:
         mycursor = mydb.cursor()
         sql = f"""
@@ -277,44 +230,25 @@ def insert_feedback_heart(mydb, table_name, input_features, predicted_outcome, u
                 predicted_outcome, user_feedback
             ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
-        values = input_features + [int(predicted_outcome), user_feedback] # Ensure it's an integer
-
-        print(f"Executing Heart Feedback SQL: {sql}")
-        print(f"With values: {values}")
-
+        values = input_features + [int(predicted_outcome), user_feedback]
         mycursor.execute(sql, values)
-        print("mycursor.execute() COMPLETED.")
         mydb.commit()
-        print("mydb.commit() COMPLETED.")
-        print("Successfully inserted heart feedback.")
+        st.success("Feedback submitted!")
         return True
     except mysql.connector.Error as err:
-        st.error(f"Error inserting heart feedback: {err}")
-        print(f"MySQL Error (Heart Feedback): {err}")
-        print(f"SQL: {sql}")
-        print(f"Values: {values}")
+        st.error(f"Error inserting feedback: {err}")
         return False
     except Exception as e:
-        st.error(f"An unexpected error occurred in insert_feedback_heart: {e}")
-        print(f"Unexpected Error (Heart Feedback): {e}")
-        print(f"SQL: {sql}")
-        print(f"Values: {values}")
+        st.error(f"An unexpected error occurred during feedback insertion: {e}")
         return False
     finally:
         if mycursor:
             mycursor.close()
-            print("mycursor CLOSED.")
-        if mydb and mydb.is_connected():
-            print("Database connection STILL active at the end of function.")
-        else:
-            print("Database connection NOT active at the end of function.")
-        return True
-# Sidebar for navigation
+    
 with st.sidebar:
     st.title("PolyDisease Predictor")
     selected = st.radio("Select Predictor", ["🦠 Multiple Disease Prediction", "🩸 Diabetes Prediction", "❤️ Heart Disease Prediction"])
 
-# Multiple Disease Prediction Page
 if selected == "🦠 Multiple Disease Prediction":
         st.title("Multiple Disease Prediction using Symptoms")
 
@@ -328,8 +262,6 @@ if selected == "🦠 Multiple Disease Prediction":
             st.error("Database connection failed.")
             st.stop()
 
-        st.info("Reached the section before prediction and feedback logic.")
-
         if predict_button and symptoms_input:
             if symptoms_input.strip():
                 try:
@@ -342,9 +274,8 @@ if selected == "🦠 Multiple Disease Prediction":
                     if mydb and mydb.is_connected():
                         for symptom in st.session_state['symptoms_list']:
                             if symptom not in features_columns:
-                                add_new_symptom_column(mydb, symptom)
-                                features_columns.append(symptom)
-                                print(f"features_columns after adding: {features_columns}")
+                                if add_new_symptom_column(mydb, symptom):
+                                    features_columns.append(symptom)
 
                 except Exception as e:
                     st.error(f"An error occurred during prediction: {e}")
@@ -353,55 +284,37 @@ if selected == "🦠 Multiple Disease Prediction":
                 st.warning("Please enter some symptoms.")
                 st.stop()
 
-        # Feedback buttons - Moved outside the 'predict_button' block
         if st.session_state.get('predicted_disease'):
             col1, col2 = st.columns(2)
 
             with col1:
                 if st.button("👍 Correct", key="correct_multiple_btn"):
-                    st.info("👍 Correct button was clicked!") # Debugging
-                    print("Calling insert_feedback_multiple for correct feedback") # Debugging
                     insert_feedback_multiple(mydb, st.session_state.get('symptoms_list'), st.session_state.get('predicted_disease'), True)
-                    with mydb.cursor() as mycursor:
-                        mycursor.execute("""SELECT * FROM poly_disease_predictor.feedback_multiple ORDER BY feedback_timestamp DESC LIMIT 5""")
-                        st.session_state['feedback_data'] = mycursor.fetchall()
-                        mydb.commit()
-
-            with col2:
-                if st.button("👎 Incorrect", key="incorrect_multiple_btn"):
-                    st.info("👎 Incorrect button was clicked!") # Debugging
-                    correct_disease_input = st.text_input("Correct Disease (optional):", "", key="correct_disease_multiple_input")
-                    if st.button("Submit Correct Disease", key="submit_correct_multiple_btn"):
-                        st.info("Submit Correct Disease button was clicked!") # Debugging
-                        print("Calling insert_feedback_multiple for incorrect feedback") # Debugging
-                        insert_feedback_multiple(mydb, st.session_state.get('symptoms_list'), st.session_state.get('predicted_disease'), False, correct_disease_input)
+                    try:
                         with mydb.cursor() as mycursor:
                             mycursor.execute("""SELECT * FROM poly_disease_predictor.feedback_multiple ORDER BY feedback_timestamp DESC LIMIT 5""")
                             st.session_state['feedback_data'] = mycursor.fetchall()
                             mydb.commit()
+                    except mysql.connector.Error as err:
+                        st.error(f"Error fetching feedback data: {err}")
+                    except Exception as e:
+                        st.error(f"An unexpected error occurred while displaying feedback: {e}")
 
-        if st.session_state.get('feedback_data'):
-            st.subheader("Recent Feedback:")
-            try:
-                mydb_feedback = create_db_connection()  # Ensure a valid connection
-                if mydb_feedback and mydb_feedback.is_connected():
-                    with mydb_feedback.cursor() as mycursor_feedback:
-                        if mycursor_feedback.description:
-                            column_names = [desc[0] for desc in mycursor_feedback.description]
-                            df_feedback = pd.DataFrame(st.session_state['feedback_data'], columns=column_names)
-                            st.dataframe(df_feedback)
-                        else:
-                            st.info("No feedback data available yet.")
-                else:
-                    st.error("Failed to connect to the database to display feedback.")
-            except mysql.connector.Error as err:
-                st.error(f"Error fetching feedback data: {err}")
-                print(f"MySQL Error (Feedback Display): {err}")
-            except Exception as e:
-                st.error(f"An unexpected error occurred while displaying feedback: {e}")
-                print(f"Unexpected Error (Feedback Display): {e}")
+            with col2:
+                if st.button("👎 Incorrect", key="incorrect_multiple_btn"):
+                    correct_disease_input = st.text_input("Correct Disease (optional):", "", key="correct_disease_multiple_input")
+                    if st.button("Submit Correct Disease", key="submit_correct_multiple_btn"):
+                        insert_feedback_multiple(mydb, st.session_state.get('symptoms_list'), st.session_state.get('predicted_disease'), False, correct_disease_input)
+                        try:
+                            with mydb.cursor() as mycursor:
+                                mycursor.execute("""SELECT * FROM poly_disease_predictor.feedback_multiple ORDER BY feedback_timestamp DESC LIMIT 5""")
+                                st.session_state['feedback_data'] = mycursor.fetchall()
+                                mydb.commit()
+                        except mysql.connector.Error as err:
+                            st.error(f"Error fetching feedback data: {err}")
+                        except Exception as e:
+                            st.error(f"An unexpected error occurred while displaying feedback: {e}")
 
-# Diabetes Prediction Page
 if "diab_diagnosis" not in st.session_state:
     st.session_state.diab_diagnosis = None
 
@@ -435,40 +348,29 @@ if selected == "🩸 Diabetes Prediction":
             else:
                 st.success("Prediction Result: Not Diabetic")
 
-        # --- User Feedback Section for Diabetes ---
         if st.session_state.get('diab_diagnosis') is not None:
             col1, col2 = st.columns(2)
             with col1:
                 if st.button("👍 Correct", key=f"correct_diabetes_button_{st.session_state.get('diab_diagnosis')}"):
-                    print("--- 'Correct' button CLICKED ---") # DEBUG
-                    st.info("👍 Correct button clicked (Diabetes)") # Debugging
                     input_data = [pregnancies, glucose, blood_pressure, skin_thickness, insulin, bmi, diabetes_pedigree_function, age]
                     predicted = st.session_state.diab_diagnosis
                     feedback_value = True
-                    print(f"Inserting Correct Feedback - Input Data: {input_data}, Predicted: {predicted}, Feedback: {feedback_value}")
                     if insert_feedback_diabetes(create_db_connection(), "feedback_diabetes", input_data, predicted, feedback_value):
                         st.success("Thank you for your feedback!")
                     else:
                         st.error("Error submitting feedback.")
-                    st.info("Feedback processing done (Correct - Diabetes)") # Debugging
 
             with col2:
                 if st.button("👎 Incorrect", key=f"incorrect_diabetes_button_{st.session_state.get('diab_diagnosis')}"):
-                    print("--- 'Incorrect' button CLICKED ---") # DEBUG
-                    st.info("👎 Incorrect button clicked (Diabetes)") # Debugging
                     input_data = [pregnancies, glucose, blood_pressure, skin_thickness, insulin, bmi, diabetes_pedigree_function, age]
                     predicted = st.session_state.diab_diagnosis
                     feedback_value = False
                     correct_diagnosis_input = st.text_input("Correct Diagnosis (optional):", "", key=f"correct_diagnosis_diabetes_{st.session_state.get('diab_diagnosis')}")
                     if st.button("Submit Correct Diagnosis", key=f"submit_correct_diabetes_button_{st.session_state.get('diab_diagnosis')}"):
-                        print("--- 'Submit Correct Diagnosis' button CLICKED ---") # DEBUG
-                        st.info("Submit Correct Diagnosis button clicked (Diabetes)") # Debugging
-                        print(f"Inserting Incorrect Feedback - Input Data: {input_data}, Predicted: {predicted}, Feedback: {feedback_value}")
                         if insert_feedback_diabetes(create_db_connection(), "feedback_diabetes", input_data, predicted, feedback_value):
                             st.info("Thank you for the corrected information!")
                         else:
                             st.error("Error submitting feedback.")
-                        st.info("Feedback processing done (Incorrect - Diabetes)") # Debugging
 
     except FileNotFoundError:
         st.error(f"Error loading the diabetes model file ('{DIABETES_MODEL_PATH}'). Please ensure it's in the 'models' directory.")
@@ -478,7 +380,6 @@ if selected == "🩸 Diabetes Prediction":
     if mydb is None:
         st.error("Failed to connect to the database for feedback.")
 
-# Heart Disease Prediction Page
 if selected == "❤️ Heart Disease Prediction":
     st.title("Heart Disease Prediction using ML")
 
@@ -511,40 +412,29 @@ if selected == "❤️ Heart Disease Prediction":
             else:
                 st.success("Prediction Result: No Heart Disease")
 
-        # --- User Feedback Section for Heart Disease ---
         if st.session_state.get('heart_diagnosis') is not None:
             col1, col2 = st.columns(2)
             with col1:
                 if st.button("👍 Correct", key=f"correct_heart_button_{st.session_state.get('heart_diagnosis')}"):
-                    print("--- 'Correct' button CLICKED ---")
-                    st.info("👍 Correct button clicked (Heart)")
                     input_data = [age_heart, sex_heart, cp_heart, trestbps_heart, chol_heart, fbs_heart, restecg_heart, thalach_heart, exang_heart, oldpeak_heart, slope_heart, ca_heart, thal_heart]
                     predicted = st.session_state.heart_diagnosis
                     feedback_value = True
-                    print(f"Inserting Correct Feedback - Input Data: {input_data}, Predicted: {predicted}, Feedback: {feedback_value}")
-                    if insert_feedback_heart(mydb, "feedback_heart", input_data, predicted, feedback_value): # Use 'mydb' here
+                    if insert_feedback_heart(mydb, "feedback_heart", input_data, predicted, feedback_value):
                         st.success("Thank you for your feedback!")
                     else:
                         st.error("Error submitting feedback.")
-                    st.info("Feedback processing done (Correct - Heart)")
 
             with col2:
                 if st.button("👎 Incorrect", key=f"incorrect_heart_button_{st.session_state.get('heart_diagnosis')}"):
-                    print("--- 'Incorrect' button CLICKED ---")
-                    st.info("👎 Incorrect button clicked (Heart)")
                     input_data = [age_heart, sex_heart, cp_heart, trestbps_heart, chol_heart, fbs_heart, restecg_heart, thalach_heart, exang_heart, oldpeak_heart, slope_heart, ca_heart, thal_heart]
                     predicted = st.session_state.heart_diagnosis
                     feedback_value = False
                     correct_diagnosis_input = st.text_input("Correct Diagnosis (optional):", "", key=f"correct_diagnosis_heart_{st.session_state.get('heart_diagnosis')}")
                     if st.button("Submit Correct Diagnosis", key=f"submit_correct_heart_button_{st.session_state.get('heart_diagnosis')}"):
-                        print("--- 'Submit Correct Diagnosis' button CLICKED ---")
-                        st.info("Submit Correct Diagnosis button clicked (Heart)")
-                        print(f"Inserting Incorrect Feedback - Input Data: {input_data}, Predicted: {predicted}, Feedback: {feedback_value}")
-                        if insert_feedback_heart(mydb, "feedback_heart", input_data, predicted, feedback_value): # Use 'mydb' here
+                        if insert_feedback_heart(mydb, "feedback_heart", input_data, predicted, feedback_value):
                             st.info("Thank you for the corrected information!")
                         else:
                             st.error("Error submitting feedback.")
-                        st.info("Feedback processing done (Incorrect - Heart)")
 
     except FileNotFoundError:
         st.error(f"Error loading the heart disease model file ('{HEART_DISEASE_MODEL_PATH}'). Please ensure it's in the 'models' directory.")

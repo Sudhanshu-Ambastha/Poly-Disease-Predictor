@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS feedback_diabetes (
     bmi FLOAT NOT NULL,
     diabetes_pedigree_function FLOAT NOT NULL,
     age INT NOT NULL,
-    predicted_outcome VARCHAR(255) NOT NULL,
+    predicted_outcome BOOLEAN NOT NULL DEFAULT 0,
     user_feedback BOOLEAN NOT NULL DEFAULT 0, 
     feedback_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )

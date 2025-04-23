@@ -13,7 +13,7 @@ CREATE TABLE IF NOT EXISTS feedback_heart (
     slope INT NOT NULL,
     ca INT NOT NULL,
     thal INT NOT NULL,
-    predicted_outcome VARCHAR(255),
+    predicted_outcome BOOLEAN NOT NULL DEFAULT 0,
     user_feedback BOOLEAN NOT NULL DEFAULT 0, 
     feedback_timestamp TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 )

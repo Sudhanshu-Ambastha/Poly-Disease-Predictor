@@ -258,6 +258,57 @@ def insert_feedback_diabetes(mydb, table_name, input_features, predicted_outcome
         else:
             print("Database connection NOT active at the end of function.")
 
+def insert_feedback_heart(mydb, table_name, input_features, predicted_outcome, user_feedback):
+    """Inserts feedback into the feedback_heart table with detailed logging."""
+    print("--- insert_feedback_heart CALLED ---")
+    print(f"Database connection object: {mydb}")
+    if mydb and mydb.is_connected():
+        print("Database connection is active.")
+    else:
+        print("Database connection is NOT active!")
+        st.error("Database connection is not available in insert_feedback_heart.")
+        return False
+
+    try:
+        mycursor = mydb.cursor()
+        sql = f"""
+            INSERT INTO {table_name} (
+                age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak, slope, ca, thal,
+                predicted_outcome, user_feedback
+            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        values = input_features + [int(predicted_outcome), user_feedback] # Ensure it's an integer
+
+        print(f"Executing Heart Feedback SQL: {sql}")
+        print(f"With values: {values}")
+
+        mycursor.execute(sql, values)
+        print("mycursor.execute() COMPLETED.")
+        mydb.commit()
+        print("mydb.commit() COMPLETED.")
+        print("Successfully inserted heart feedback.")
+        return True
+    except mysql.connector.Error as err:
+        st.error(f"Error inserting heart feedback: {err}")
+        print(f"MySQL Error (Heart Feedback): {err}")
+        print(f"SQL: {sql}")
+        print(f"Values: {values}")
+        return False
+    except Exception as e:
+        st.error(f"An unexpected error occurred in insert_feedback_heart: {e}")
+        print(f"Unexpected Error (Heart Feedback): {e}")
+        print(f"SQL: {sql}")
+        print(f"Values: {values}")
+        return False
+    finally:
+        if mycursor:
+            mycursor.close()
+            print("mycursor CLOSED.")
+        if mydb and mydb.is_connected():
+            print("Database connection STILL active at the end of function.")
+        else:
+            print("Database connection NOT active at the end of function.")
+        return True
 # Sidebar for navigation
 with st.sidebar:
     st.title("PolyDisease Predictor")
@@ -432,11 +483,6 @@ if selected == "❤️ Heart Disease Prediction":
     st.title("Heart Disease Prediction using ML")
 
     mydb = create_db_connection()
-    if mydb.is_connected():
-        st.success("Database connection successful (test)!")
-        # mydb.close()
-    else:
-        st.error("Database connection failed (test).")
 
     try:
         heart_disease_model = pickle.load(open(HEART_DISEASE_MODEL_PATH, 'rb'))
@@ -457,58 +503,53 @@ if selected == "❤️ Heart Disease Prediction":
 
         if st.button("Heart Disease Test Result"):
             input_features = [age_heart, sex_heart, cp_heart, trestbps_heart, chol_heart, fbs_heart, restecg_heart, thalach_heart, exang_heart, oldpeak_heart, slope_heart, ca_heart, thal_heart]
-            heart_disease_prediction = heart_disease_model.predict([input_features])
-            heart_disease_diagnosis = "The person has heart disease" if heart_disease_prediction[0] == 1 else "The person does not have heart disease"
-            st.success(heart_disease_diagnosis)
+            heart_prediction = heart_disease_model.predict([input_features])
+            st.session_state.heart_diagnosis = int(heart_prediction[0])
 
-            # --- User Feedback Section for Heart Disease ---
-            mydb = create_db_connection()
-            if mydb and mydb.is_connected():
-                mycursor = mydb.cursor()
-                col1, col2 = st.columns(2)
-                with col1:
-                    if st.button("👍 Correct", key="correct_heart"):
-                        sql = "INSERT INTO feedback_heart (age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak, slope, ca, thal, predicted_outcome, user_feedback) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                        val = (age_heart, sex_heart, cp_heart, trestbps_heart, chol_heart, fbs_heart, restecg_heart, thalach_heart, exang_heart, oldpeak_heart, slope_heart, ca_heart, thal_heart, heart_disease_diagnosis, True)
-                        try:
-                            mycursor.execute(sql, val)
-                            mydb.commit()
-                            st.success("Thank you for your feedback!")
-                            st.info(f"Data Added - SQL: {sql}")
-                            st.info(f"Data Added - Values: {val}")
-                        except mysql.connector.Error as err:
-                            st.error(f"Error inserting feedback: {err}")
-                            print(f"SQL: {sql}")
-                            print(f"Values: {val}")
-                        finally:
-                            mycursor.close()
-                    else:
-                        st.error("Failed to connect to the database for feedback.")
-                with col2:
-                    if st.button("👎 Incorrect", key="incorrect_heart"):
-                        st.warning("Thank you for your feedback. Please tell us the correct diagnosis if you know it:")
-                        correct_diagnosis_input = st.text_input("Correct Diagnosis (optional):", "", key="correct_diagnosis_heart")
-                        if st.button("Submit Correct Diagnosis", key="submit_correct_heart"):
-                            sql = "INSERT INTO feedback_heart (age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak, slope, ca, thal, predicted_outcome, user_feedback, correct_diagnosis) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)"
-                            val = (age_heart, sex_heart, cp_heart, trestbps_heart, chol_heart, fbs_heart, restecg_heart, thalach_heart, exang_heart, oldpeak_heart, slope_heart, ca_heart, thal_heart, heart_disease_diagnosis, False, correct_diagnosis_input.strip().capitalize() if correct_diagnosis_input else None)
-                            try:
-                                mycursor.execute(sql, val)
-                                mydb.commit()
-                                st.info("Thank you for the corrected information!")
-                                st.info(f"Data Added - SQL: {sql}")
-                                st.info(f"Data Added - Values: {val}")
-                            except mysql.connector.Error as err:
-                                st.error(f"Error inserting corrected feedback: {err}")
-                                print(f"SQL: {sql}")
-                                print(f"Values: {val}")
-                            finally:
-                                mycursor.close()
-                    else:
-                        st.error("Failed to connect to the database for feedback.")
-                mydb.close()
+            if heart_prediction[0] == 1:
+                st.success("Prediction Result: Has Heart Disease")
+            else:
+                st.success("Prediction Result: No Heart Disease")
 
-            elif mydb is None:
-                st.error("Failed to connect to the database for feedback.")
-    
+        # --- User Feedback Section for Heart Disease ---
+        if st.session_state.get('heart_diagnosis') is not None:
+            col1, col2 = st.columns(2)
+            with col1:
+                if st.button("👍 Correct", key=f"correct_heart_button_{st.session_state.get('heart_diagnosis')}"):
+                    print("--- 'Correct' button CLICKED ---")
+                    st.info("👍 Correct button clicked (Heart)")
+                    input_data = [age_heart, sex_heart, cp_heart, trestbps_heart, chol_heart, fbs_heart, restecg_heart, thalach_heart, exang_heart, oldpeak_heart, slope_heart, ca_heart, thal_heart]
+                    predicted = st.session_state.heart_diagnosis
+                    feedback_value = True
+                    print(f"Inserting Correct Feedback - Input Data: {input_data}, Predicted: {predicted}, Feedback: {feedback_value}")
+                    if insert_feedback_heart(mydb, "feedback_heart", input_data, predicted, feedback_value): # Use 'mydb' here
+                        st.success("Thank you for your feedback!")
+                    else:
+                        st.error("Error submitting feedback.")
+                    st.info("Feedback processing done (Correct - Heart)")
+
+            with col2:
+                if st.button("👎 Incorrect", key=f"incorrect_heart_button_{st.session_state.get('heart_diagnosis')}"):
+                    print("--- 'Incorrect' button CLICKED ---")
+                    st.info("👎 Incorrect button clicked (Heart)")
+                    input_data = [age_heart, sex_heart, cp_heart, trestbps_heart, chol_heart, fbs_heart, restecg_heart, thalach_heart, exang_heart, oldpeak_heart, slope_heart, ca_heart, thal_heart]
+                    predicted = st.session_state.heart_diagnosis
+                    feedback_value = False
+                    correct_diagnosis_input = st.text_input("Correct Diagnosis (optional):", "", key=f"correct_diagnosis_heart_{st.session_state.get('heart_diagnosis')}")
+                    if st.button("Submit Correct Diagnosis", key=f"submit_correct_heart_button_{st.session_state.get('heart_diagnosis')}"):
+                        print("--- 'Submit Correct Diagnosis' button CLICKED ---")
+                        st.info("Submit Correct Diagnosis button clicked (Heart)")
+                        print(f"Inserting Incorrect Feedback - Input Data: {input_data}, Predicted: {predicted}, Feedback: {feedback_value}")
+                        if insert_feedback_heart(mydb, "feedback_heart", input_data, predicted, feedback_value): # Use 'mydb' here
+                            st.info("Thank you for the corrected information!")
+                        else:
+                            st.error("Error submitting feedback.")
+                        st.info("Feedback processing done (Incorrect - Heart)")
+
+    except FileNotFoundError:
+        st.error(f"Error loading the heart disease model file ('{HEART_DISEASE_MODEL_PATH}'). Please ensure it's in the 'models' directory.")
     except Exception as e:
-        st.error(f"An error occurred while loading the heart disease model: {e}")
+        st.error(f"An unexpected error occurred while loading the heart disease model: {e}")
+
+    if mydb is None:
+        st.error("Failed to connect to the database for feedback.")

@@ -32,11 +32,11 @@ set_bg_from_url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQB5z1mX8y
 
 
 # --- Define File Paths ---
-MODEL_FILE_PATH = os.path.join(os.path.dirname(__file__), 'CombinedModel.sav')
-LABEL_ENCODER_PATH = os.path.join(os.path.dirname(__file__), 'label_encoder.sav')
-TRAINING_DATA_PATH = os.path.join(os.path.dirname(__file__), 'Training.csv')
-DIABETES_MODEL_PATH = os.path.join(os.path.dirname(__file__), 'DiabetesModel.sav')
-HEART_DISEASE_MODEL_PATH = os.path.join(os.path.dirname(__file__), 'HeartModel.sav')
+MODEL_FILE_PATH = os.path.join(os.path.dirname(__file__), './models/CombinedModel.sav')
+LABEL_ENCODER_PATH = os.path.join(os.path.dirname(__file__), './models/label_encoder.sav')
+TRAINING_DATA_PATH = os.path.join(os.path.dirname(__file__), './models/Training.csv')
+DIABETES_MODEL_PATH = os.path.join(os.path.dirname(__file__), './models/DiabetesModel.sav')
+HEART_DISEASE_MODEL_PATH = os.path.join(os.path.dirname(__file__), './models/HeartModel.sav')
 
 @st.cache_resource
 def create_db_connection():
@@ -55,9 +55,9 @@ def create_db_connection():
 
             # Execute SQL files to create tables
             sql_files = [
-                "create_feedback_diabetes_table.sql",
-                "create_feedback_heart_table.sql",
-                "create_feedback_multiple_table.sql",
+                "./sql/create_feedback_diabetes_table.sql",
+                "./sql/create_feedback_heart_table.sql",
+                "./sql/create_feedback_multiple_table.sql",
             ]
             for sql_file in sql_files:
                 sql_file_path = os.path.join(os.path.dirname(__file__), sql_file)
@@ -68,7 +68,6 @@ def create_db_connection():
                             if statement.strip():
                                 cursor.execute(statement)
                     connection.commit()
-                    print(f"Successfully executed SQL from {sql_file}")
                 except FileNotFoundError:
                     st.error(f"Error: SQL file not found at {sql_file_path}")
                     return None

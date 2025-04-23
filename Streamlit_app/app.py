@@ -344,7 +344,7 @@ if selected == "🩸 Diabetes Prediction":
                         except mysql.connector.Error as err:
                             st.error(f"Error inserting feedback: {err}")
                             print(f"SQL: {sql}")
-                            print(f"Values: {values}")
+                            print(f"Values: {val}")
                         finally:
                             mycursor.close()
                     else:
@@ -365,7 +365,7 @@ if selected == "🩸 Diabetes Prediction":
                             except mysql.connector.Error as err:
                                 st.error(f"Error inserting corrected feedback: {err}")
                                 print(f"SQL: {sql}")
-                                print(f"Values: {values}")
+                                print(f"Values: {val}")
                             finally:
                                 mycursor.close()
                     else:
@@ -432,7 +432,7 @@ if selected == "❤️ Heart Disease Prediction":
                         except mysql.connector.Error as err:
                             st.error(f"Error inserting feedback: {err}")
                             print(f"SQL: {sql}")
-                            print(f"Values: {values}")
+                            print(f"Values: {val}")
                         finally:
                             mycursor.close()
                     else:
@@ -453,7 +453,7 @@ if selected == "❤️ Heart Disease Prediction":
                             except mysql.connector.Error as err:
                                 st.error(f"Error inserting corrected feedback: {err}")
                                 print(f"SQL: {sql}")
-                                print(f"Values: {values}")
+                                print(f"Values: {val}")
                             finally:
                                 mycursor.close()
                     else:

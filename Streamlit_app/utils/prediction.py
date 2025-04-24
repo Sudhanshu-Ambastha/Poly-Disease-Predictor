@@ -1,3 +1,4 @@
+# prediction.py
 import pandas as pd
 import numpy as np
 import streamlit as st
@@ -5,15 +6,15 @@ import mysql.connector
 from mysql.connector import errorcode
 from utils.model_loading import load_combined_model, load_label_encoder, load_training_data_columns
 
-def predict_diseases(symptoms_str):
+def predict_diseases(symptoms_str, features_columns, combined_model, label_encoder):
     symptoms = [s.strip().lower().replace(' ', '_') for s in symptoms_str.split(',')]
     input_data = pd.DataFrame(np.zeros((1, len(features_columns)), dtype=int), columns=features_columns)
     for symptom in symptoms:
         if symptom in input_data.columns:
             input_data[symptom] = 1
 
-    prediction_encoded = load_combined_model.predict(input_data)[0]
-    predicted_disease = load_label_encoder.inverse_transform([prediction_encoded])[0]
+    prediction_encoded = combined_model.predict(input_data)[0]
+    predicted_disease = label_encoder.inverse_transform([prediction_encoded])[0]
     return predicted_disease
 
 def add_new_symptom_column(mydb, symptom):
@@ -24,7 +25,6 @@ def add_new_symptom_column(mydb, symptom):
             mycursor.execute(f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'feedback_multiple' AND COLUMN_NAME LIKE '{safe_symptom}'")
             result = mycursor.fetchone()
             if not result:
-                # Fetch the list of existing symptom columns to determine where to add the new one
                 mycursor.execute("""
                     SELECT COLUMN_NAME
                     FROM INFORMATION_SCHEMA.COLUMNS

@@ -10,6 +10,7 @@ from datetime import datetime
 from utils.ui import set_bg_from_url
 from utils.db import create_db_connection
 from utils.model_loading import load_combined_model, load_label_encoder, load_training_data_columns, load_diabetes_model, load_heart_disease_model
+from utils.prediction import predict_diseases, add_new_symptom_column
 from utils.feedback import insert_feedback_multiple, insert_feedback_diabetes, insert_feedback_heart
 
 st.set_page_config(page_title="Multiple Disease Prediction App")
@@ -23,64 +24,6 @@ label_encoder = load_label_encoder()
 
 if 'feedback_data' not in st.session_state:
     st.session_state['feedback_data'] = []
-
-def predict_diseases(symptoms_str):
-    symptoms = [s.strip().lower().replace(' ', '_') for s in symptoms_str.split(',')]
-    input_data = pd.DataFrame(np.zeros((1, len(features_columns)), dtype=int), columns=features_columns)
-    for symptom in symptoms:
-        if symptom in input_data.columns:
-            input_data[symptom] = 1
-
-    prediction_encoded = combined_model.predict(input_data)[0]
-    predicted_disease = label_encoder.inverse_transform([prediction_encoded])[0]
-    return predicted_disease
-
-def add_new_symptom_column(mydb, symptom):
-    """Adds a new symptom column to the feedback_multiple table if it doesn't exist."""
-    safe_symptom = ''.join(c if c.isalnum() or c == '_' else '_' for c in symptom)
-    try:
-        with mydb.cursor() as mycursor:
-            mycursor.execute(f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'feedback_multiple' AND COLUMN_NAME LIKE '{safe_symptom}'")
-            result = mycursor.fetchone()
-            if not result:
-                # Fetch the list of existing symptom columns to determine where to add the new one
-                mycursor.execute("""
-                    SELECT COLUMN_NAME
-                    FROM INFORMATION_SCHEMA.COLUMNS
-                    WHERE TABLE_NAME = 'feedback_multiple'
-                    AND COLUMN_NAME NOT IN ('id', 'prognosis', 'user_feedback', 'feedback_timestamp', 'correct_diagnosis')
-                    ORDER BY ORDINAL_POSITION
-                """)
-                symptom_columns_results = mycursor.fetchall()
-                symptom_columns = [res[0] for res in symptom_columns_results]
-
-                alter_sql = ""
-                if symptom_columns:
-                    last_symptom = symptom_columns[-1]
-                    alter_sql = f"ALTER TABLE feedback_multiple ADD COLUMN `{safe_symptom}` BOOLEAN NOT NULL DEFAULT 0 AFTER `{last_symptom}`"
-                else:
-                    alter_sql = f"ALTER TABLE feedback_multiple ADD COLUMN `{safe_symptom}` BOOLEAN NOT NULL DEFAULT 0 AFTER `id`"
-
-                try:
-                    mycursor.execute(alter_sql)
-                    mydb.commit()
-                    print(f"Successfully added column: {safe_symptom}")
-                    return True
-                except mysql.connector.Error as err:
-                    st.error(f"Error altering table to add column '{safe_symptom}': {err}")
-                    print(f"MySQL Error (ALTER TABLE): {err}")
-                    return False
-            else:
-                print(f"Column '{safe_symptom}' already exists.")
-                return True
-    except mysql.connector.Error as err:
-        st.error(f"Error checking for column '{safe_symptom}': {err}")
-        print(f"MySQL Error (SHOW COLUMNS): {err}")
-        return False
-    except Exception as e:
-        st.error(f"An unexpected error occurred while adding column '{safe_symptom}': {e}")
-        print(f"Unexpected Error (add_new_symptom_column): {e}")
-        return False
     
 with st.sidebar:
     st.title("PolyDisease Predictor")
@@ -102,7 +45,8 @@ if selected == "🦠 Multiple Disease Prediction":
         if predict_button and symptoms_input:
             if symptoms_input.strip():
                 try:
-                    predicted_disease = predict_diseases(symptoms_input)
+                    # Ensure you are passing features_columns, combined_model, and label_encoder
+                    predicted_disease = predict_diseases(symptoms_input, features_columns, combined_model, label_encoder)
                     st.success(f"Predicted Disease: {predicted_disease}")
 
                     st.session_state['predicted_disease'] = predicted_disease
@@ -112,7 +56,9 @@ if selected == "🦠 Multiple Disease Prediction":
                         for symptom in st.session_state['symptoms_list']:
                             if symptom not in features_columns:
                                 if add_new_symptom_column(mydb, symptom):
-                                    features_columns.append(symptom)
+                                    # Reload features_columns if needed
+                                    train_df, features_columns = load_training_data_columns()
+                                    print(f"Updated features_columns after adding '{symptom}': {features_columns}")
 
                 except Exception as e:
                     st.error(f"An error occurred during prediction: {e}")

@@ -30,60 +30,60 @@ with st.sidebar:
     selected = st.radio("Select Predictor", ["🦠 Multiple Disease Prediction", "🩸 Diabetes Prediction", "❤️ Heart Disease Prediction"])
 
 if selected == "🦠 Multiple Disease Prediction":
-        st.title("Multiple Disease Prediction using Symptoms")
+    st.title("Multiple Disease Prediction using Symptoms")
 
-        symptoms_input = st.text_area("Enter your symptoms (comma-separated):", placeholder="e.g. Itching, Skin Rash, Nodal Skin Eruptions")
-        predict_button = st.button("Predict Disease")
+    symptoms_input = st.text_area("Enter your symptoms (comma-separated):", placeholder="e.g. Itching, Skin Rash, Nodal Skin Eruptions")
+    predict_button = st.button("Predict Disease")
 
-        mydb = create_db_connection()
-        if mydb and mydb.is_connected():
-            st.success("Database connection successful!")
+    mydb = create_db_connection()
+    if mydb and mydb.is_connected():
+        st.success("Database connection successful!")
+    else:
+        st.error("Database connection failed.")
+        st.stop()
+
+    if predict_button and symptoms_input:
+        if symptoms_input.strip():
+            try:
+                predicted_disease = predict_diseases(symptoms_input, features_columns, combined_model, label_encoder)
+                st.success(f"Predicted Disease: {predicted_disease}")
+
+                st.session_state['predicted_disease'] = predicted_disease
+                st.session_state['symptoms_list'] = [s.strip().lower().replace(' ', '_') for s in symptoms_input.split(',')]
+
+                if mydb and mydb.is_connected():
+                    for symptom in st.session_state['symptoms_list']:
+                        if symptom not in features_columns:
+                            if add_new_symptom_column(mydb, symptom):
+                                # Reload features_columns if needed
+                                train_df, features_columns = load_training_data_columns()
+                                print(f"Updated features_columns after adding '{symptom}': {features_columns}")
+
+            except Exception as e:
+                st.error(f"An error occurred during prediction: {e}")
+                st.stop()
         else:
-            st.error("Database connection failed.")
+            st.warning("Please enter some symptoms.")
             st.stop()
 
-        if predict_button and symptoms_input:
-            if symptoms_input.strip():
-                try:
-                    # Ensure you are passing features_columns, combined_model, and label_encoder
-                    predicted_disease = predict_diseases(symptoms_input, features_columns, combined_model, label_encoder)
-                    st.success(f"Predicted Disease: {predicted_disease}")
+    if st.session_state.get('predicted_disease'):
+        col1, col2 = st.columns(2)
 
-                    st.session_state['predicted_disease'] = predicted_disease
-                    st.session_state['symptoms_list'] = [s.strip().lower().replace(' ', '_') for s in symptoms_input.split(',')]
+        with col1:
+            if st.button("👍 Correct", key="correct_multiple_btn"):
+                if insert_feedback_multiple(mydb, st.session_state.get('symptoms_list'), st.session_state.get('predicted_disease'), True):
+                    st.success("Thank you for your feedback!")
+                else:
+                    st.error("Error submitting feedback.")
 
-                    if mydb and mydb.is_connected():
-                        for symptom in st.session_state['symptoms_list']:
-                            if symptom not in features_columns:
-                                if add_new_symptom_column(mydb, symptom):
-                                    # Reload features_columns if needed
-                                    train_df, features_columns = load_training_data_columns()
-                                    print(f"Updated features_columns after adding '{symptom}': {features_columns}")
-
-                except Exception as e:
-                    st.error(f"An error occurred during prediction: {e}")
-                    st.stop()
-            else:
-                st.warning("Please enter some symptoms.")
-                st.stop()
-
-        if st.session_state.get('predicted_disease'):
-            col1, col2 = st.columns(2)
-
-            with col1:
-                if st.button("👍 Correct", key="correct_multiple_btn"):
-                    if insert_feedback_multiple(mydb, st.session_state.get('symptoms_list'), st.session_state.get('predicted_disease'), True):
-                        st.success("Thank you for your feedback!")
+        with col2:
+            if st.button("👎 Incorrect", key="incorrect_multiple_btn"):
+                correct_disease_input = st.text_input("Correct Disease (optional):", "", key="correct_disease_multiple_input")
+                if st.button("Submit Correct Disease", key="submit_correct_multiple_btn"):
+                    if insert_feedback_multiple(mydb, st.session_state.get('symptoms_list'), st.session_state.get('predicted_disease'), False, correct_disease_input):
+                        st.info("Thank you for the corrected information!")
                     else:
                         st.error("Error submitting feedback.")
-            with col2:
-                if st.button("👎 Incorrect", key="incorrect_multiple_btn"):
-                    correct_disease_input = st.text_input("Correct Disease (optional):", "", key="correct_disease_multiple_input")
-                    if st.button("Submit Correct Disease", key="submit_correct_multiple_btn"):
-                        if insert_feedback_multiple(mydb, st.session_state.get('symptoms_list'), st.session_state.get('predicted_disease'), False, correct_disease_input):
-                            st.success("Thank you for the corrected information!")
-                        else:
-                            st.error("Error submitting feedback.")
                         
 if "diab_diagnosis" not in st.session_state:
     st.session_state.diab_diagnosis = None

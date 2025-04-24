@@ -73,31 +73,13 @@ if selected == "🦠 Multiple Disease Prediction":
             with col1:
                 if st.button("👍 Correct", key="correct_multiple_btn"):
                     insert_feedback_multiple(mydb, st.session_state.get('symptoms_list'), st.session_state.get('predicted_disease'), True)
-                    try:
-                        with mydb.cursor() as mycursor:
-                            mycursor.execute("""SELECT * FROM poly_disease_predictor.feedback_multiple ORDER BY feedback_timestamp DESC LIMIT 5""")
-                            st.session_state['feedback_data'] = mycursor.fetchall()
-                            mydb.commit()
-                    except mysql.connector.Error as err:
-                        st.error(f"Error fetching feedback data: {err}")
-                    except Exception as e:
-                        st.error(f"An unexpected error occurred while displaying feedback: {e}")
 
             with col2:
                 if st.button("👎 Incorrect", key="incorrect_multiple_btn"):
                     correct_disease_input = st.text_input("Correct Disease (optional):", "", key="correct_disease_multiple_input")
                     if st.button("Submit Correct Disease", key="submit_correct_multiple_btn"):
                         insert_feedback_multiple(mydb, st.session_state.get('symptoms_list'), st.session_state.get('predicted_disease'), False, correct_disease_input)
-                        try:
-                            with mydb.cursor() as mycursor:
-                                mycursor.execute("""SELECT * FROM poly_disease_predictor.feedback_multiple ORDER BY feedback_timestamp DESC LIMIT 5""")
-                                st.session_state['feedback_data'] = mycursor.fetchall()
-                                mydb.commit()
-                        except mysql.connector.Error as err:
-                            st.error(f"Error fetching feedback data: {err}")
-                        except Exception as e:
-                            st.error(f"An unexpected error occurred while displaying feedback: {e}")
-
+                        
 if "diab_diagnosis" not in st.session_state:
     st.session_state.diab_diagnosis = None
 

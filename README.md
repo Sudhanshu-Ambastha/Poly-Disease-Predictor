@@ -50,13 +50,29 @@ PolyDisease Predictor is a Streamlit web application that uses machine learning 
         port = your_port
         ```
 
-5.  **Run the Application:**
+**Connecting to FreeSQLDatabase (Optional):**
+
+    If you prefer to use a free online MySQL database, you can use [FreeSQLDatabase](https://www.freesqldatabase.com/). Here's how to connect:
+
+    * Sign up for a free account at [FreeSQLDatabase](https://www.freesqldatabase.com/).
+    * Once you've created a database, you'll receive your connection details (server address, port, database name, username, and password) at mail.
+    * Update your `.streamlit/secrets.toml` file with these credentials:
+
+        ```toml
+        host = "your_freesqldatabase_host" # e.g., "sql12.freesqldatabase.com"
+        user = "your_freesqldatabase_user"
+        password = "your_freesqldatabase_password"
+        port = your_freesqldatabase_port # Usually 3306
+        database = "your_freesqldatabase_name"
+        ```
+
+1.  **Run the Application:**
 
     ```bash
     streamlit run Streamlit_app/app.py
     ```
 
-6.  **Access the Application:**
+2.  **Access the Application:**
 
     Open your web browser and navigate to the URL provided in the terminal (usually `http://localhost:8501`).
 
@@ -101,6 +117,7 @@ Open your web browser and navigate to the provided URL (usually http://localhost
 This project was created to address challenges faced in earlier models, making it easy to run directly via VS Code, especially when opened through GitHub Desktop. With the presence of necessary files, the project can now be executed seamlessly.
 
 Please checkout the deployed working model here [Poly Disease Predictor](https://poly-disease-predictor.streamlit.app/)
+Backend deployed at [Free SQL Database](https://www.freesqldatabase.com/account/)
 
 Feel free to contribute and enhance the application!
 

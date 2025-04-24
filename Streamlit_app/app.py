@@ -7,101 +7,19 @@ import pickle
 import mysql.connector
 from mysql.connector import errorcode
 from datetime import datetime
-
-def set_bg_from_url(url, opacity=1):
-    st.markdown(
-        f"""
-        <style>
-            body {{
-                background: url('{url}') no-repeat center center fixed;
-                background-size: cover;
-                opacity: 0.875;
-            }}
-        </style>
-        """,
-        unsafe_allow_html=True
-    )
+from utils.ui import set_bg_from_url
+from utils.db import create_db_connection
+from utils.model_loading import load_combined_model, load_label_encoder, load_training_data_columns, load_diabetes_model, load_heart_disease_model
+from utils.feedback import insert_feedback_multiple, insert_feedback_diabetes, insert_feedback_heart
 
 st.set_page_config(page_title="Multiple Disease Prediction App")
-
 set_bg_from_url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQB5z1mX8yxvSR0LwZscejLXVDU-_nCS5AYCA&s")
 
-MODEL_FILE_PATH = os.path.join(os.path.dirname(__file__), './models/CombinedModel.sav')
-LABEL_ENCODER_PATH = os.path.join(os.path.dirname(__file__), './models/label_encoder.sav')
-TRAINING_DATA_PATH = os.path.join(os.path.dirname(__file__), './models/Training.csv')
-DIABETES_MODEL_PATH = os.path.join(os.path.dirname(__file__), './models/DiabetesModel.sav')
-HEART_DISEASE_MODEL_PATH = os.path.join(os.path.dirname(__file__), './models/HeartModel.sav')
-
-@st.cache_resource
-def create_db_connection():
-    try:
-        connection = mysql.connector.connect(
-            host=st.secrets["mysql"]["host"],
-            user=st.secrets["mysql"]["user"],
-            password=st.secrets["mysql"]["password"],
-            port=st.secrets["mysql"]["port"],
-        )
-        if connection.is_connected():
-            cursor = connection.cursor()
-            cursor.execute("CREATE DATABASE IF NOT EXISTS poly_disease_predictor")
-            cursor.execute("USE poly_disease_predictor")
-
-            sql_files = [
-                "./sql/create_feedback_diabetes_table.sql",
-                "./sql/create_feedback_heart_table.sql",
-                "./sql/create_feedback_multiple_table.sql",
-            ]
-            for sql_file in sql_files:
-                sql_file_path = os.path.join(os.path.dirname(__file__), sql_file)
-                try:
-                    with open(sql_file_path, 'r') as f:
-                        sql_script = f.read()
-                        for statement in sql_script.split(';\n'):
-                            if statement.strip():
-                                cursor.execute(statement)
-                    connection.commit()
-                except FileNotFoundError:
-                    st.error(f"Error: SQL file not found at {sql_file_path}")
-                    return None
-                except mysql.connector.Error as err:
-                    st.error(f"Error executing SQL from {sql_file}: {err}")
-                    return None
-
-            return connection
-        else:
-            st.error("Failed to connect to the database.")
-            return None
-    except mysql.connector.Error as err:
-        st.error(f"Error connecting to MySQL: {err}")
-        return None
-
-try:
-    combined_model = joblib.load(MODEL_FILE_PATH)
-except FileNotFoundError:
-    st.error(f"Error loading the combined model file ('{MODEL_FILE_PATH}'). Please ensure it's in the correct directory.")
-    st.stop()
-except Exception as e:
-    st.error(f"An unexpected error occurred while loading the combined model: {e}")
-    st.stop()
-
-try:
-    label_encoder = joblib.load(LABEL_ENCODER_PATH)
-except FileNotFoundError:
-    st.error(f"Error loading the LabelEncoder file ('{LABEL_ENCODER_PATH}'). Please ensure it's in the correct directory.")
-    st.stop()
-except Exception as e:
-    st.error(f"An unexpected error occurred while loading the LabelEncoder: {e}")
-    st.stop()
-
-try:
-    train_data = pd.read_csv(TRAINING_DATA_PATH)
-    features_columns = train_data.drop('prognosis', axis=1).columns.tolist()
-except FileNotFoundError:
-    st.error(f"Error loading 'Training.csv' ('{TRAINING_DATA_PATH}'). Please ensure it's in the same directory as the app.")
-    st.stop()
-except Exception as e:
-    st.error(f"An unexpected error occurred while loading 'Training.csv': {e}")
-    st.stop()
+train_df, features_columns = load_training_data_columns()
+diabetes_model = load_diabetes_model()
+heart_model = load_heart_disease_model()
+combined_model = load_combined_model()
+label_encoder = load_label_encoder()
 
 if 'feedback_data' not in st.session_state:
     st.session_state['feedback_data'] = []
@@ -163,87 +81,6 @@ def add_new_symptom_column(mydb, symptom):
         st.error(f"An unexpected error occurred while adding column '{safe_symptom}': {e}")
         print(f"Unexpected Error (add_new_symptom_column): {e}")
         return False
-
-def insert_feedback_multiple(mydb, symptoms_list, predicted_disease, user_feedback, correct_disease=None):
-    if mydb and mydb.is_connected():
-        try:
-            with mydb.cursor() as mycursor:
-                mycursor.execute("SHOW COLUMNS FROM feedback_multiple")
-                columns_data = mycursor.fetchall()
-                db_columns = [col[0] for col in columns_data]
-
-                symptom_columns = [col for col in db_columns if col not in ['id', 'prognosis', 'user_feedback', 'feedback_timestamp', 'correct_diagnosis']]
-                all_columns = symptom_columns + ['prognosis', 'user_feedback']
-                placeholders_arr = ['%s'] * len(all_columns)
-                all_placeholders = ', '.join(placeholders_arr)
-
-                sql = f"INSERT INTO feedback_multiple ({', '.join(all_columns)}) VALUES ({all_placeholders})"
-                values_to_insert = [1 if col in symptoms_list else 0 for col in symptom_columns] + [predicted_disease, user_feedback]
-
-                if correct_disease:
-                    all_columns.append('correct_diagnosis')
-                    all_placeholders += ', %s'
-                    sql = f"INSERT INTO feedback_multiple ({', '.join(all_columns)}) VALUES ({all_placeholders})"
-                    values_to_insert.append(correct_disease.strip().capitalize())
-
-                mycursor.execute(sql, tuple(values_to_insert))
-                mydb.commit()
-                st.success("Feedback submitted!")
-
-        except mysql.connector.Error as err:
-            st.error(f"Error inserting feedback: {err}")
-        except Exception as e:
-            st.error(f"An unexpected error occurred during feedback insertion: {e}")
-    else:
-        st.error("Database connection failed for feedback.")
-
-def insert_feedback_diabetes(mydb, table_name, input_features, predicted_outcome, user_feedback):
-    try:
-        mycursor = mydb.cursor()
-        sql = f"""
-            INSERT INTO {table_name} (
-                pregnancies, glucose, blood_pressure, skin_thickness, insulin, bmi, diabetes_pedigree_function, age,
-                predicted_outcome, user_feedback
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """
-        values = input_features + [int(predicted_outcome), user_feedback]
-        mycursor.execute(sql, values)
-        mydb.commit()
-        st.success("Feedback submitted!")
-        return True
-    except mysql.connector.Error as err:
-        st.error(f"Error inserting feedback: {err}")
-        return False
-    except Exception as e:
-        st.error(f"An unexpected error occurred during feedback insertion: {e}")
-        return False
-    finally:
-        if mycursor:
-            mycursor.close()
-
-def insert_feedback_heart(mydb, table_name, input_features, predicted_outcome, user_feedback):
-    try:
-        mycursor = mydb.cursor()
-        sql = f"""
-            INSERT INTO {table_name} (
-                age, sex, cp, trestbps, chol, fbs, restecg, thalach, exang, oldpeak, slope, ca, thal,
-                predicted_outcome, user_feedback
-            ) VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
-        """
-        values = input_features + [int(predicted_outcome), user_feedback]
-        mycursor.execute(sql, values)
-        mydb.commit()
-        st.success("Feedback submitted!")
-        return True
-    except mysql.connector.Error as err:
-        st.error(f"Error inserting feedback: {err}")
-        return False
-    except Exception as e:
-        st.error(f"An unexpected error occurred during feedback insertion: {e}")
-        return False
-    finally:
-        if mycursor:
-            mycursor.close()
     
 with st.sidebar:
     st.title("PolyDisease Predictor")
@@ -326,7 +163,7 @@ if selected == "🩸 Diabetes Prediction":
         st.error("Failed to connect to the database for feedback.")
 
     try:
-        diabetes_model = joblib.load(open(DIABETES_MODEL_PATH, 'rb'))
+        diabetes_model = load_diabetes_model()
 
         pregnancies = st.number_input("Number of Pregnancies", min_value=0)
         glucose = st.number_input("Glucose Level", min_value=0)
@@ -373,7 +210,7 @@ if selected == "🩸 Diabetes Prediction":
                             st.error("Error submitting feedback.")
 
     except FileNotFoundError:
-        st.error(f"Error loading the diabetes model file ('{DIABETES_MODEL_PATH}'). Please ensure it's in the 'models' directory.")
+        st.error(f"Error loading the diabetes model file ('DIABETES_MODEL_PATH'). Please ensure it's in the 'models' directory.")
     except Exception as e:
         st.error(f"An unexpected error occurred while loading the diabetes model: {e}")
 
@@ -386,7 +223,7 @@ if selected == "❤️ Heart Disease Prediction":
     mydb = create_db_connection()
 
     try:
-        heart_disease_model = pickle.load(open(HEART_DISEASE_MODEL_PATH, 'rb'))
+        heart_disease_model = load_heart_disease_model()
 
         age_heart = st.number_input("Age", min_value=0)
         sex_heart = st.number_input("Sex", min_value=0, max_value=1)
@@ -437,7 +274,7 @@ if selected == "❤️ Heart Disease Prediction":
                             st.error("Error submitting feedback.")
 
     except FileNotFoundError:
-        st.error(f"Error loading the heart disease model file ('{HEART_DISEASE_MODEL_PATH}'). Please ensure it's in the 'models' directory.")
+        st.error(f"Error loading the heart disease model file ('HEART_DISEASE_MODEL_PATH'). Please ensure it's in the 'models' directory.")
     except Exception as e:
         st.error(f"An unexpected error occurred while loading the heart disease model: {e}")
 

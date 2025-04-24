@@ -37,7 +37,7 @@ matplotlib-inline==0.1.7
 mysql-connector-python==9.2.0
 narwhals==1.33.0
 nest-asyncio==1.6.0
-numpy==2.2.4
+numpy==2.2.4  # Or just 'numpy'
 packaging==24.2
 pandas==2.2.3
 parso==0.8.4
@@ -52,9 +52,7 @@ pyarrow==19.0.1
 pydeck==0.9.1
 Pygments==2.19.1
 pyparsing==3.2.3
-python-dateutil==2.9.0.post0
 pytz==2025.2
-pywin32==310
 PyYAML==6.0.2
 pyzmq==26.4.0
 referencing==0.36.2
@@ -79,5 +77,4 @@ tzdata==2025.2
 urllib3==2.3.0
 watchdog==6.0.0
 wcwidth==0.2.13
-wheel==0.45.1
 wheel==0.45.1

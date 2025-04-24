@@ -31,6 +31,10 @@ PolyDisease Predictor is a Streamlit web application that uses machine learning 
     ```bash
     pip install -r Streamlit_app/requirements.txt
     ```
+    to save dependencies:
+    ```bash
+    pip freeze > requirements.txt
+    ```
 
 4.  **Database Setup (Optional):**
 

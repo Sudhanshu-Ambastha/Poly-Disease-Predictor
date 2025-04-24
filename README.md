@@ -50,21 +50,21 @@ PolyDisease Predictor is a Streamlit web application that uses machine learning 
         port = your_port
         ```
 
-**Connecting to FreeSQLDatabase (Optional):**
+    **Connecting to FreeSQLDatabase (Optional):**
 
-    If you prefer to use a free online MySQL database, you can use [FreeSQLDatabase](https://www.freesqldatabase.com/). Here's how to connect:
+        If you prefer to use a free online MySQL database, you can use [FreeSQLDatabase](https://www.freesqldatabase.com/). Here's how to connect:
 
-    * Sign up for a free account at [FreeSQLDatabase](https://www.freesqldatabase.com/).
-    * Once you've created a database, you'll receive your connection details (server address, port, database name, username, and password) at mail.
-    * Update your `.streamlit/secrets.toml` file with these credentials:
+        * Sign up for a free account at [FreeSQLDatabase](https://www.freesqldatabase.com/).
+        * Once you've created a database, you'll receive your connection details (server address, port, database name, username, and password) at mail.
+        * Update your `.streamlit/secrets.toml` file with these credentials:
 
-        ```toml
-        host = "your_freesqldatabase_host" # e.g., "sql12.freesqldatabase.com"
-        user = "your_freesqldatabase_user"
-        password = "your_freesqldatabase_password"
-        port = your_freesqldatabase_port # Usually 3306
-        database = "your_freesqldatabase_name"
-        ```
+            ```toml
+            host = "your_freesqldatabase_host" # e.g., "sql12.freesqldatabase.com"
+            user = "your_freesqldatabase_user"
+            password = "your_freesqldatabase_password"
+            port = your_freesqldatabase_port # Usually 3306
+            database = "your_freesqldatabase_name"
+            ```
 
 1.  **Run the Application:**
 

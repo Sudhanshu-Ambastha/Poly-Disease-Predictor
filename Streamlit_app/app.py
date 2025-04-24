@@ -71,10 +71,10 @@ if selected == "🦠 Multiple Disease Prediction":
 
         with col1:
             if st.button("👍 Correct", key="correct_multiple_btn"):
-                if insert_feedback_multiple(mydb, st.session_state.get('symptoms_list'), st.session_state.get('predicted_disease'), True):
-                    st.success("Thank you for your feedback!")
-                else:
-                    st.error("Error submitting feedback.")
+                insert_feedback_multiple(mydb, st.session_state.get('symptoms_list'), st.session_state.get('predicted_disease'), True)
+                #     st.success("Thank you for your feedback!")
+                # else:
+                #     st.error("Error submitting feedback.")
 
         with col2:
             if st.button("👎 Incorrect", key="incorrect_multiple_btn"):

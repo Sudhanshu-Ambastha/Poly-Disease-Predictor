@@ -7,10 +7,10 @@ from mysql.connector import errorcode
 def create_db_connection():
     try:
         connection = mysql.connector.connect(
-            host=st.secrets["mysql"]["host"],
-            user=st.secrets["mysql"]["user"],
-            password=st.secrets["mysql"]["password"],
-            port=st.secrets["mysql"]["port"],
+            host=st.secrets["host"],
+            user=st.secrets["user"],
+            password=st.secrets["password"],
+            port=st.secrets["port"]
         )
         if connection.is_connected():
             cursor = connection.cursor()

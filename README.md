@@ -116,9 +116,7 @@ Open your web browser and navigate to the provided URL (usually http://localhost
 **Update:**
 This project was created to address challenges faced in earlier models, making it easy to run directly via VS Code, especially when opened through GitHub Desktop. With the presence of necessary files, the project can now be executed seamlessly.
 
-Please checkout the deployed working model here [Poly Disease Predictor](https://poly-disease-predictor.streamlit.app/)
-
-Backend deployed at [Free SQL Database](https://www.freesqldatabase.com/account/)
+Please checkout the deployed working model here [Poly Disease Predictor](https://poly-disease-predictor.streamlit.app/) & Backend deployed at [Free SQL Database](https://www.freesqldatabase.com/account/)
 
 Feel free to contribute and enhance the application!
 

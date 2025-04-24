@@ -15,14 +15,14 @@ PolyDisease Predictor is a Streamlit web application that uses machine learning 
 1.  **Clone the Repository:**
 
     ```bash
-    git clone [https://github.com/Sudhanshu-Ambastha/Poly-Disease-Predictor.git](https://github.com/Sudhanshu-Ambastha/Poly-Disease-Predictor.git)
+    git clone https://github.com/Sudhanshu-Ambastha/Poly-Disease-Predictor.git
     cd Poly-Disease-Predictor
     ```
 
 2.  **Create a Virtual Environment (Recommended):**
 
     ```bash
-    conda create -n polydisease python=3.9  # Or your preferred Python version
+    conda create -n polydisease python=3.9
     conda activate polydisease
     ```
 

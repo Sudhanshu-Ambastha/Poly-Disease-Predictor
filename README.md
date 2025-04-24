@@ -22,7 +22,7 @@ PolyDisease Predictor is a Streamlit web application that uses machine learning 
 2.  **Create a Virtual Environment (Recommended):**
 
     ```bash
-    conda create -n polydisease python=3.9  # Or your preferred Python version
+    conda create -n polydisease python=3.9
     conda activate polydisease
     ```
 

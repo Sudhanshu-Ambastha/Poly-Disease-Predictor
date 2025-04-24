@@ -14,8 +14,8 @@ def create_db_connection():
         )
         if connection.is_connected():
             cursor = connection.cursor()
-            cursor.execute("CREATE DATABASE IF NOT EXISTS poly_disease_predictor")
-            cursor.execute("USE poly_disease_predictor")
+            cursor.execute("CREATE DATABASE IF NOT EXISTS sql12775228")
+            cursor.execute("USE sql12775228")
 
             sql_files = [
                 "../sql/create_feedback_diabetes_table.sql",

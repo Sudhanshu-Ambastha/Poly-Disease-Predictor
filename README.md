@@ -15,7 +15,7 @@ PolyDisease Predictor is a Streamlit web application that uses machine learning 
 1.  **Clone the Repository:**
 
     ```bash
-    git clone [https://github.com/Sudhanshu-Ambastha/Poly-Disease-Predictor.git](https://github.com/Sudhanshu-Ambastha/Poly-Disease-Predictor.git)
+    git clone https://github.com/Sudhanshu-Ambastha/Poly-Disease-Predictor.git
     cd Poly-Disease-Predictor
     ```
 

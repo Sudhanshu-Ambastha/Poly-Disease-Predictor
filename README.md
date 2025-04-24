@@ -1,39 +1,60 @@
 # PolyDisease Predictor
 
-PolyDisease Predictor is a Streamlit web application that allows users to predict various diseases, including diabetes, heart disease, and multiple diseases based on provided symptoms and health parameters.
+PolyDisease Predictor is a Streamlit web application that uses machine learning models to predict various diseases, including diabetes, heart disease, and multiple diseases based on user-provided symptoms and health parameters. The application also incorporates user feedback to improve prediction accuracy
 
 ## Usage
 
-**Clone Repository:**
+**Prerequisites:**
 
-```bash
-git clone https://github.com/Sudhanshu-Ambastha/Poly-Disease-Predictor.git
-```
+  * Python 3.6+
+  * Anaconda or Miniconda (recommended)
+  * MySQL Server (if you intend to use the database features)
 
-```
-cd Streamlit_app
-```
+**Setup:**
 
-**Install Dependencies:**
-This command is used to generate a `requirements.txt` file based on the packages currently installed in your active Python environment
+1.  **Clone the Repository:**
 
-```
-pip freeze > requirements.txt
-```
+    ```bash
+    git clone [https://github.com/Sudhanshu-Ambastha/Poly-Disease-Predictor.git](https://github.com/Sudhanshu-Ambastha/Poly-Disease-Predictor.git)
+    cd Poly-Disease-Predictor
+    ```
 
-The command to install dependencies from a `requirements.txt` file
+2.  **Create a Virtual Environment (Recommended):**
 
-```
-pip install -r Streamlit_app/requirements.txt
-```
+    ```bash
+    conda create -n polydisease python=3.9  # Or your preferred Python version
+    conda activate polydisease
+    ```
 
-**Run the Application:**
+3.  **Install Dependencies:**
 
-Open Anaconda Command Prompt and run the following command:
+    ```bash
+    pip install -r Streamlit_app/requirements.txt
+    ```
 
-```bash
-python -m streamlit run "Streamlit_app/app.py"
-```
+4.  **Database Setup (Optional):**
+
+      * Ensure your MySQL server is running.
+
+      * Create a `.streamlit/secrets.toml` file in your project directory.  This file should contain your database credentials.  See the provided `tomlStruct.txt` for the expected structure.  Example:
+
+        ```toml
+        [mysql]
+        host = "your_host"
+        user = "your_user"
+        password = "your_password"
+        port = your_port
+        ```
+
+5.  **Run the Application:**
+
+    ```bash
+    streamlit run Streamlit_app/app.py
+    ```
+
+6.  **Access the Application:**
+
+    Open your web browser and navigate to the URL provided in the terminal (usually `http://localhost:8501`).
 
 ## Access the Application:
 
@@ -41,18 +62,16 @@ Open your web browser and navigate to the provided URL (usually http://localhost
 
 ## Features
 
-Diabetes Prediction
-Predicts whether a person is diabetic or not based on provided health parameters.
-Heart Disease Prediction
-Predicts whether a person has heart disease or not based on cardiovascular health parameters.
-Multiple Disease Prediction
-Predicts multiple diseases using symptoms provided by the user.
+  * **Multiple Disease Prediction:** Predicts potential diseases based on a comma-separated list of symptoms.  Allows user feedback (correct/incorrect) to improve the model.  Dynamically adds new symptoms to the database.
+  * **Diabetes Prediction:** Predicts the likelihood of diabetes based on health parameters (pregnancies, glucose, blood pressure, etc.).  Collects user feedback.
+  * **Heart Disease Prediction:** Predicts the likelihood of heart disease based on cardiovascular health parameters. Collects user feedback.
 
 ## How to Use
 
-Select the disease predictor from the sidebar.
-Follow the instructions and input the required information.
-Click the corresponding button to get the prediction result.
+1.  Select the desired predictor tab from the sidebar.
+2.  Enter the required information (symptoms, health parameters).
+3.  Click the "Predict" or "Test Result" button.
+4.  Provide feedback on the prediction to help improve the model.
 
 ## Data Sources
 
@@ -63,18 +82,12 @@ Click the corresponding button to get the prediction result.
 - Multiple disease dataset: Custom dataset used for training and testing.
   - [training. csv](https://www.kaggle.com/datasets/kaushil268/disease-prediction-using-machine-learning)
 
-## Note
+## Important Notes
 
-This project is designed for easy accessibility without downloading the files. Users can run it directly via VS Code by changing the terminal path to make it easily accessible. If users encounter issues like "file not found," ensure the terminal path is correctly set within VS Code.
-
-- **Ensure Python and Anaconda are Installed:**
-  Make sure to have Python and Anaconda installed.
-
-- **Internet Connection Required:**
-  Internet connection is required to run the application.
-
-- **GitHub Repository Link:**
-  Access the GitHub repository for Combined Disease Prediction Bot: [Combined Disease Prediction Bot](https://github.com/Sudhanshu-Ambastha/Combined-Disease-Prediction-Bot)
+  * **File Paths:** The application uses relative file paths.  Ensure the `models` directory and `.sql` files are in the correct locations relative to the `app.py` file.
+  * **Database Connection:** If you intend to use the feedback features, ensure your MySQL database is set up correctly and the credentials are in the `.streamlit/secrets.toml` file.
+  * **Model Files:** The application relies on pre-trained machine learning models (`.sav` files) located in the `models` directory.  Ensure these files are present.
+  * **Dependencies:** All required Python packages are listed in `Streamlit_app/requirements.txt`.
 
 **Check out the video related to it**
 

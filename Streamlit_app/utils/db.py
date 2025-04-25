@@ -6,33 +6,12 @@ from mysql.connector import errorcode
 @st.cache_resource
 def create_db_connection():
     try:
-        if os.environ.get("STREAMLIT_IS_RUNNING") == "1":
-            try:
-                connection = mysql.connector.connect(
-                    host=st.secrets["host"],
-                    user=st.secrets["user"],
-                    password=st.secrets["password"],
-                    port=st.secrets["port"],
-                )
-                print("Connected using st.secrets (Deployment)")
-            except mysql.connector.Error as err:
-                st.error(f"Error connecting to MySQL (Deployment): {err}")
-                return None
-        else:
-            try:
-                connection = mysql.connector.connect(
-                    host=st.secrets["mysql"]["host"],
-                    user=st.secrets["mysql"]["user"],
-                    password=st.secrets["mysql"]["password"],
-                    port=st.secrets["mysql"]["port"],
-                )
-                print("Connected using [mysql] in secrets (Local)")
-            except KeyError:
-                st.error("Error: Missing [mysql] section in your local secrets.toml file.")
-                return None
-            except mysql.connector.Error as err:
-                st.error(f"Error connecting to MySQL (Local): {err}")
-                return None
+        connection = mysql.connector.connect(
+            host=st.secrets["mysql"]["host"],
+            user=st.secrets["mysql"]["user"],
+            password=st.secrets["mysql"]["password"],
+            port=st.secrets["mysql"]["port"]
+        )
 
         if connection.is_connected():
             cursor = connection.cursor()

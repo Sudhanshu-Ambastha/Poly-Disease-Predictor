@@ -2,38 +2,51 @@ import streamlit as st
 import mysql.connector
 from mysql.connector import errorcode
 
-def insert_feedback_multiple(mydb, symptoms_list, predicted_disease, user_feedback, correct_disease=None):
-    if mydb and mydb.is_connected():
-        try:
-            with mydb.cursor() as mycursor:
-                mycursor.execute("SHOW COLUMNS FROM feedback_multiple")
-                columns_data = mycursor.fetchall()
-                db_columns = [col[0] for col in columns_data]
+def insert_feedback_multiple(mydb, symptoms, predicted_disease, user_feedback, correct_diagnosis=None):
+    try:
+        with mydb.cursor() as mycursor:
+            columns = ["prognosis", "user_feedback", "correct_diagnosis"]
+            values = [predicted_disease, user_feedback, correct_diagnosis if correct_diagnosis is not None else ""]
 
-                symptom_columns = [col for col in db_columns if col not in ['id', 'prognosis', 'user_feedback', 'feedback_timestamp', 'correct_diagnosis']]
-                all_columns = symptom_columns + ['prognosis', 'user_feedback']
-                placeholders_arr = ['%s'] * len(all_columns)
-                all_placeholders = ', '.join(placeholders_arr)
+            # Fetch all existing symptom columns from the database
+            mycursor.execute("DESCRIBE feedback_multiple;")
+            existing_columns_info = mycursor.fetchall()
+            existing_symptom_columns = [col[0].lower() for col in existing_columns_info if col[0] not in ['id', 'prognosis', 'user_feedback', 'feedback_timestamp', 'correct_diagnosis']]
 
-                sql = f"INSERT INTO feedback_multiple ({', '.join(all_columns)}) VALUES ({all_placeholders})"
-                values_to_insert = [1 if col in symptoms_list else 0 for col in symptom_columns] + [predicted_disease, user_feedback]
+            # Set values for existing and new symptom columns
+            for symptom in existing_symptom_columns:
+                columns.append(f"`{symptom}`")
+                values.append(1 if symptom in [s.lower().replace(' ', '_') for s in symptoms] else 0)
 
-                if correct_disease:
-                    all_columns.append('correct_diagnosis')
-                    all_placeholders += ', %s'
-                    sql = f"INSERT INTO feedback_multiple ({', '.join(all_columns)}) VALUES ({all_placeholders})"
-                    values_to_insert.append(correct_disease.strip().capitalize())
+            # Add new symptom columns if they don't exist
+            for symptom in symptoms:
+                safe_symptom = f"`{symptom.lower().replace(' ', '_')}`"
+                if symptom.lower().replace(' ', '_') not in existing_symptom_columns:
+                    try:
+                        mycursor.execute(f"ALTER TABLE feedback_multiple ADD COLUMN {safe_symptom} BOOLEAN NOT NULL DEFAULT 0")
+                        mydb.commit()
+                        columns.append(safe_symptom)
+                        values.append(1)
+                    except mysql.connector.Error as e:
+                        st.error(f"Error adding column {symptom}: {e}")
+                        print(f"Error adding column {symptom}: {e}")
+                        return False
 
-                mycursor.execute(sql, tuple(values_to_insert))
-                mydb.commit()
-                st.success("Feedback submitted!")
-
-        except mysql.connector.Error as err:
-            st.error(f"Error inserting feedback: {err}")
-        except Exception as e:
-            st.error(f"An unexpected error occurred during feedback insertion: {e}")
-    else:
-        st.error("Database connection failed for feedback.")
+            placeholders = ", ".join(["%s"] * len(columns))
+            sql = f"INSERT INTO feedback_multiple ({', '.join(columns)}) VALUES ({placeholders})"
+            mycursor.execute(sql, values)
+            mydb.commit()
+            return True
+    except mysql.connector.Error as err:
+        st.error(f"Error inserting feedback: {err}")
+        print(f"Error inserting feedback into feedback_multiple: {err}")
+        mydb.rollback()
+        return False
+    except Exception as e:
+        st.error(f"An unexpected error occurred: {e}")
+        print(f"An unexpected error occurred: {e}")
+        mydb.rollback()
+        return False
 
 def insert_feedback_diabetes(mydb, table_name, input_features, predicted_outcome, user_feedback):
     try:

@@ -1,10 +1,8 @@
-# prediction.py
 import pandas as pd
 import numpy as np
-import streamlit as st
 import mysql.connector
 from mysql.connector import errorcode
-from utils.model_loading import load_combined_model, load_label_encoder, load_training_data_columns
+import streamlit as st
 
 def predict_diseases(symptoms_str, features_columns, combined_model, label_encoder):
     symptoms = [s.strip().lower().replace(' ', '_') for s in symptoms_str.split(',')]
@@ -18,47 +16,63 @@ def predict_diseases(symptoms_str, features_columns, combined_model, label_encod
     return predicted_disease
 
 def add_new_symptom_column(mydb, symptom):
-    """Adds a new symptom column to the feedback_multiple table if it doesn't exist."""
+    # Sanitize the symptom name for safe column naming
     safe_symptom = ''.join(c if c.isalnum() or c == '_' else '_' for c in symptom)
+    column_name = f"`{safe_symptom}`"
+
     try:
         with mydb.cursor() as mycursor:
-            mycursor.execute(f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'feedback_multiple' AND COLUMN_NAME LIKE '{safe_symptom}'")
-            result = mycursor.fetchone()
-            if not result:
-                mycursor.execute("""
-                    SELECT COLUMN_NAME
-                    FROM INFORMATION_SCHEMA.COLUMNS
-                    WHERE TABLE_NAME = 'feedback_multiple'
-                    AND COLUMN_NAME NOT IN ('id', 'prognosis', 'user_feedback', 'feedback_timestamp', 'correct_diagnosis')
-                    ORDER BY ORDINAL_POSITION
-                """)
-                symptom_columns_results = mycursor.fetchall()
-                symptom_columns = [res[0] for res in symptom_columns_results]
+            # Debug: Show all columns in the table
+            print("Checking existing columns in 'feedback_multiple':")
+            mycursor.execute("DESCRIBE feedback_multiple;")
+            columns_info = mycursor.fetchall()
+            existing_db_columns = [col[0] for col in columns_info] # Extract column names
+            print(f"Existing columns in DB: {existing_db_columns}")
 
-                alter_sql = ""
-                if symptom_columns:
-                    last_symptom = symptom_columns[-1]
-                    alter_sql = f"ALTER TABLE feedback_multiple ADD COLUMN `{safe_symptom}` BOOLEAN NOT NULL DEFAULT 0 AFTER `{last_symptom}`"
-                else:
-                    alter_sql = f"ALTER TABLE feedback_multiple ADD COLUMN `{safe_symptom}` BOOLEAN NOT NULL DEFAULT 0 AFTER `id`"
-
-                try:
-                    mycursor.execute(alter_sql)
-                    mydb.commit()
-                    print(f"Successfully added column: {safe_symptom}")
-                    return True
-                except mysql.connector.Error as err:
-                    st.error(f"Error altering table to add column '{safe_symptom}': {err}")
-                    print(f"MySQL Error (ALTER TABLE): {err}")
-                    return False
-            else:
+            if safe_symptom in existing_db_columns:
                 print(f"Column '{safe_symptom}' already exists.")
                 return True
+
+            # Get the current symptom columns to determine the placement for the new column
+            mycursor.execute(
+                """
+                SELECT COLUMN_NAME
+                FROM INFORMATION_SCHEMA.COLUMNS
+                WHERE TABLE_SCHEMA = DATABASE()
+                  AND TABLE_NAME = 'feedback_multiple'
+                  AND COLUMN_NAME NOT IN ('id', 'prognosis', 'user_feedback', 'feedback_timestamp', 'correct_diagnosis')
+                ORDER BY ORDINAL_POSITION
+                """
+            )
+            symptom_columns = [row[0] for row in mycursor.fetchall()]
+
+            # Prepare SQL to add the new column
+            alter_sql = f"ALTER TABLE `feedback_multiple` ADD COLUMN {column_name} BOOLEAN NOT NULL DEFAULT 0"
+            if symptom_columns:
+                alter_sql += f" AFTER `{symptom_columns[-1]}`"  # Place after the last symptom column
+            else:
+                alter_sql += " AFTER `id`"  # Place after 'id' if no symptom columns exist
+
+            # Execute the column addition
+            print(f"Executing SQL: {alter_sql}")
+            mycursor.execute(alter_sql)
+            mydb.commit()
+            print(f"Successfully added column: {safe_symptom}")
+            return True
+
     except mysql.connector.Error as err:
-        st.error(f"Error checking for column '{safe_symptom}': {err}")
-        print(f"MySQL Error (SHOW COLUMNS): {err}")
+        print(f"MySQL Error: {err}")
+        if 'st' in globals():
+            st.error(f"MySQL Error: {err}")
+        if err.errno == errorcode.ER_TABLE_NOT_FOUND:
+            print("Table 'feedback_multiple' not found.")
+            if 'st' in globals():
+                st.error("Table 'feedback_multiple' not found.")
+        elif err.errno == errorcode.ER_DUP_FIELDNAME:
+            print(f"Column '{safe_symptom}' already exists (duplicate).")
         return False
     except Exception as e:
-        st.error(f"An unexpected error occurred while adding column '{safe_symptom}': {e}")
-        print(f"Unexpected Error (add_new_symptom_column): {e}")
+        print(f"An unexpected error occurred: {e}")
+        if 'st' in globals():
+            st.error(f"An unexpected error occurred: {e}")
         return False

@@ -14,7 +14,9 @@ from utils.prediction import predict_diseases, add_new_symptom_column
 from utils.feedback import insert_feedback_multiple, insert_feedback_diabetes, insert_feedback_heart
 
 st.set_page_config(page_title="Multiple Disease Prediction App")
-set_bg_from_url("https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQB5z1mX8yxvSR0LwZscejLXVDU-_nCS5AYCA&s")
+set_bg_from_url(
+    "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQB5z1mX8yxvSR0LwZscejLXVDU-_nCS5AYCA&s"
+)
 
 train_df, features_columns = load_training_data_columns()
 diabetes_model = load_diabetes_model()
@@ -22,12 +24,15 @@ heart_model = load_heart_disease_model()
 combined_model = load_combined_model()
 label_encoder = load_label_encoder()
 
-if 'feedback_data' not in st.session_state:
-    st.session_state['feedback_data'] = []
-    
+if "feedback_data" not in st.session_state:
+    st.session_state["feedback_data"] = []
+
 with st.sidebar:
     st.title("PolyDisease Predictor")
-    selected = st.radio("Select Predictor", ["🦠 Multiple Disease Prediction", "🩸 Diabetes Prediction", "❤️ Heart Disease Prediction"])
+    selected = st.radio(
+        "Select Predictor",
+        ["🦠 Multiple Disease Prediction", "🩸 Diabetes Prediction", "❤️ Heart Disease Prediction"],
+    )
 
 if selected == "🦠 Multiple Disease Prediction":
     st.title("Multiple Disease Prediction using Symptoms")
@@ -48,16 +53,25 @@ if selected == "🦠 Multiple Disease Prediction":
                 predicted_disease = predict_diseases(symptoms_input, features_columns, combined_model, label_encoder)
                 st.success(f"Predicted Disease: {predicted_disease}")
 
-                st.session_state['predicted_disease'] = predicted_disease
-                st.session_state['symptoms_list'] = [s.strip().lower().replace(' ', '_') for s in symptoms_input.split(',')]
+                st.session_state["predicted_disease"] = predicted_disease
+                st.session_state["symptoms_list"] = [s.strip().lower().replace(' ', '_') for s in symptoms_input.split(',')]
 
                 if mydb and mydb.is_connected():
-                    for symptom in st.session_state['symptoms_list']:
-                        if symptom not in features_columns:
+                    mycursor = mydb.cursor()
+                    mycursor.execute("DESCRIBE feedback_multiple;")
+                    existing_columns_info = mycursor.fetchall()
+                    existing_db_columns = [col[0] for col in existing_columns_info]
+                    mycursor.close()
+
+                    for symptom in st.session_state["symptoms_list"]:
+                        safe_symptom = ''.join(c if c.isalnum() or c == '_' else '_' for c in symptom)
+                        if safe_symptom not in existing_db_columns and safe_symptom not in ['id', 'prognosis', 'user_feedback', 'feedback_timestamp', 'correct_diagnosis']:
                             if add_new_symptom_column(mydb, symptom):
-                                # Reload features_columns if needed
                                 train_df, features_columns = load_training_data_columns()
                                 print(f"Updated features_columns after adding '{symptom}': {features_columns}")
+                            else:
+                                st.error(f"Failed to add symptom column: {symptom}. The feedback might not be saved correctly.")
+                                st.stop()
 
             except Exception as e:
                 st.error(f"An error occurred during prediction: {e}")
@@ -66,21 +80,26 @@ if selected == "🦠 Multiple Disease Prediction":
             st.warning("Please enter some symptoms.")
             st.stop()
 
-    if st.session_state.get('predicted_disease'):
+    if st.session_state.get("predicted_disease"):
         col1, col2 = st.columns(2)
 
         with col1:
             if st.button("👍 Correct", key="correct_multiple_btn"):
-                insert_feedback_multiple(mydb, st.session_state.get('symptoms_list'), st.session_state.get('predicted_disease'), True)
+                insert_feedback_multiple(mydb, st.session_state.get("symptoms_list"), st.session_state.get("predicted_disease"), True, None )
 
         with col2:
-            if st.button("👎 Incorrect", key="incorrect_multiple_btn"):
-                correct_disease_input = st.text_input("Correct Disease (optional):", "", key="correct_disease_multiple_input")
-                if st.button("Submit Correct Disease", key="submit_correct_multiple_btn"):
-                    if insert_feedback_multiple(mydb, st.session_state.get('symptoms_list'), st.session_state.get('predicted_disease'), False, correct_disease_input):
-                        st.info("Thank you for the corrected information!")
-                    else:
-                        st.error("Error submitting feedback.")
+            incorrect_feedback_clicked = st.button("👎 Incorrect", key="incorrect_multiple_btn")
+            if incorrect_feedback_clicked:
+                st.session_state["incorrect_feedback"] = True
+
+        if st.session_state.get("incorrect_feedback"):
+            correct_disease_input = st.text_input("Correct Disease (optional):", "", key="correct_disease_multiple_input")
+            if st.button("Submit Correct Disease", key="submit_correct_multiple_btn"):
+                symptoms_list = st.session_state.get("symptoms_list")
+                predicted_disease = st.session_state.get("predicted_disease")
+                insert_feedback_multiple(mydb, symptoms_list, predicted_disease, False, correct_disease_input)
+                st.info("Thank you for the corrected information!")
+                st.session_state["incorrect_feedback"] = False
                         
 if "diab_diagnosis" not in st.session_state:
     st.session_state.diab_diagnosis = None

@@ -109,10 +109,6 @@ Open your web browser and navigate to the provided URL (usually http://localhost
   * **Model Files:** The application relies on pre-trained machine learning models (`.sav` files) located in the `models` directory.  Ensure these files are present.
   * **Dependencies:** All required Python packages are listed in `Streamlit_app/requirements.txt`.
 
-**Check out the video related to it**
-
-[![Poly Disease Predictor](https://img.youtube.com/vi/G7AvMkZ0VGM/0.jpg)](https://www.youtube.com/watch?v=G7AvMkZ0VGM&t=1s "Poly Disease Predictor")
-
 **Update:**
 This project was created to address challenges faced in earlier models, making it easy to run directly via VS Code, especially when opened through GitHub Desktop. With the presence of necessary files, the project can now be executed seamlessly.
 

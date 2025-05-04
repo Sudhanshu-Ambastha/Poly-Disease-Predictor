@@ -8,17 +8,14 @@ def insert_feedback_multiple(mydb, symptoms, predicted_disease, user_feedback, c
             columns = ["prognosis", "user_feedback", "correct_diagnosis"]
             values = [predicted_disease, user_feedback, correct_diagnosis if correct_diagnosis is not None else ""]
 
-            # Fetch all existing symptom columns from the database
             mycursor.execute("DESCRIBE feedback_multiple;")
             existing_columns_info = mycursor.fetchall()
             existing_symptom_columns = [col[0].lower() for col in existing_columns_info if col[0] not in ['id', 'prognosis', 'user_feedback', 'feedback_timestamp', 'correct_diagnosis']]
 
-            # Set values for existing and new symptom columns
             for symptom in existing_symptom_columns:
                 columns.append(f"`{symptom}`")
                 values.append(1 if symptom in [s.lower().replace(' ', '_') for s in symptoms] else 0)
 
-            # Add new symptom columns if they don't exist
             for symptom in symptoms:
                 safe_symptom = f"`{symptom.lower().replace(' ', '_')}`"
                 if symptom.lower().replace(' ', '_') not in existing_symptom_columns:

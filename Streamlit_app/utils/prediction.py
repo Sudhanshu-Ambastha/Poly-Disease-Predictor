@@ -16,24 +16,21 @@ def predict_diseases(symptoms_str, features_columns, combined_model, label_encod
     return predicted_disease
 
 def add_new_symptom_column(mydb, symptom):
-    # Sanitize the symptom name for safe column naming
     safe_symptom = ''.join(c if c.isalnum() or c == '_' else '_' for c in symptom)
     column_name = f"`{safe_symptom}`"
 
     try:
         with mydb.cursor() as mycursor:
-            # Debug: Show all columns in the table
             print("Checking existing columns in 'feedback_multiple':")
             mycursor.execute("DESCRIBE feedback_multiple;")
             columns_info = mycursor.fetchall()
-            existing_db_columns = [col[0] for col in columns_info] # Extract column names
+            existing_db_columns = [col[0] for col in columns_info] 
             print(f"Existing columns in DB: {existing_db_columns}")
 
             if safe_symptom in existing_db_columns:
                 print(f"Column '{safe_symptom}' already exists.")
                 return True
 
-            # Get the current symptom columns to determine the placement for the new column
             mycursor.execute(
                 """
                 SELECT COLUMN_NAME
@@ -46,14 +43,12 @@ def add_new_symptom_column(mydb, symptom):
             )
             symptom_columns = [row[0] for row in mycursor.fetchall()]
 
-            # Prepare SQL to add the new column
             alter_sql = f"ALTER TABLE `feedback_multiple` ADD COLUMN {column_name} BOOLEAN NOT NULL DEFAULT 0"
             if symptom_columns:
-                alter_sql += f" AFTER `{symptom_columns[-1]}`"  # Place after the last symptom column
+                alter_sql += f" AFTER `{symptom_columns[-1]}`" 
             else:
-                alter_sql += " AFTER `id`"  # Place after 'id' if no symptom columns exist
+                alter_sql += " AFTER `id`" 
 
-            # Execute the column addition
             print(f"Executing SQL: {alter_sql}")
             mycursor.execute(alter_sql)
             mydb.commit()

@@ -4,7 +4,6 @@ import pandas as pd
 import streamlit as st
 import pickle
 
-# Corrected file paths
 MODEL_FILE_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'models', 'CombinedModel.sav')
 LABEL_ENCODER_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'models', 'label_encoder.sav')
 TRAINING_DATA_PATH = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'models', 'Training.csv')
@@ -73,3 +72,62 @@ def load_heart_disease_model():
     except Exception as e:
         st.error(f"An unexpected error occurred while loading the heart disease model: {e}")
         st.stop()
+
+import mysql.connector
+import streamlit as st
+import os
+
+SQL_DIR = os.path.join(os.path.dirname(os.path.dirname(__file__)), 'sql')
+
+SQL_FILES = [
+    "create_feedback_diabetes_table.sql",
+    "create_feedback_heart_table.sql",
+    "create_feedback_multiple_table.sql"
+]
+
+@st.cache_resource
+def create_db_connection():
+    """
+    Establishes a connection to the MySQL database and creates the necessary tables
+    if they don't exist by executing SQL scripts.
+    """
+    try:
+        connection = mysql.connector.connect(
+            host=st.secrets["mysql"]["host"],
+            user=st.secrets["mysql"]["user"],
+            password=st.secrets["mysql"]["password"],
+            port=st.secrets["mysql"]["port"],
+            database="sql12775228"
+        )
+        if connection.is_connected():
+            cursor = connection.cursor()
+            st.info("Successfully connected to the MySQL database.")
+
+            for sql_file in SQL_FILES:
+                file_path = os.path.join(SQL_DIR, sql_file)
+                try:
+                    with open(file_path, 'r') as f:
+                        sql_script = f.read()
+                        cursor.execute(sql_script)
+                        connection.commit()
+                        st.info(f"Successfully executed SQL script: {sql_file}")
+                except FileNotFoundError:
+                    st.error(f"SQL script not found: {sql_file}")
+                except mysql.connector.Error as err:
+                    st.error(f"Error executing SQL script '{sql_file}': {err}")
+                    connection.rollback()
+                except Exception as e:
+                    st.error(f"An unexpected error occurred while processing '{sql_file}': {e}")
+                    connection.rollback()
+
+            cursor.close()
+            return connection
+        else:
+            st.error("Failed to connect to the database.")
+            return None
+    except mysql.connector.Error as err:
+        st.error(f"Error connecting to MySQL: {err}")
+        return None
+    except Exception as e:
+        st.error(f"An unexpected error occurred during database connection: {e}")
+        return None

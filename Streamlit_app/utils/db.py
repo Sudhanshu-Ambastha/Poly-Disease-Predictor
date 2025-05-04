@@ -55,7 +55,6 @@ def add_new_symptom_column(mydb, symptom):
             mycursor.execute(f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = 'feedback_multiple' AND COLUMN_NAME LIKE '{safe_symptom}'")
             result = mycursor.fetchone()
             if not result:
-                # Fetch the list of existing symptom columns to determine where to add the new one
                 mycursor.execute("""
                     SELECT COLUMN_NAME
                     FROM INFORMATION_SCHEMA.COLUMNS

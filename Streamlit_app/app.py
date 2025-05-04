@@ -114,14 +114,19 @@ if selected == "🩸 Diabetes Prediction":
     try:
         diabetes_model = load_diabetes_model()
 
-        pregnancies = st.number_input("Number of Pregnancies", min_value=0)
-        glucose = st.number_input("Glucose Level", min_value=0)
-        blood_pressure = st.number_input("Blood Pressure value", min_value=0)
-        skin_thickness = st.number_input("Skin Thickness value", min_value=0)
-        insulin = st.number_input("Insulin Level", min_value=0)
-        bmi = st.number_input("BMI value", min_value=0.0)
-        diabetes_pedigree_function = st.number_input("Diabetes Pedigree Function value", min_value=0.0)
-        age = st.number_input("Age of the Person", min_value=0)
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            pregnancies = st.number_input("Pregnancies", min_value=0)
+            glucose = st.number_input("Glucose", min_value=0)
+            blood_pressure = st.number_input("Blood Pressure", min_value=0)
+        with col2:
+            skin_thickness = st.number_input("Skin Thickness", min_value=0)
+            insulin = st.number_input("Insulin", min_value=0)
+            bmi = st.number_input("BMI", min_value=0.0)
+        with col3:
+            diabetes_pedigree_function = st.number_input("Pedigree Function", min_value=0.0)
+            age = st.number_input("Age", min_value=0)
+            st.empty() 
 
         if st.button("Diabetes Test Result", key="diabetes_test_result_button"):
             input_features = [pregnancies, glucose, blood_pressure, skin_thickness, insulin, bmi, diabetes_pedigree_function, age]
@@ -174,19 +179,24 @@ if selected == "❤️ Heart Disease Prediction":
     try:
         heart_disease_model = load_heart_disease_model()
 
-        age_heart = st.number_input("Age", min_value=0)
-        sex_heart = st.number_input("Sex", min_value=0, max_value=1)
-        cp_heart = st.number_input("Chest Pain types", min_value=0, max_value=3)
-        trestbps_heart = st.number_input("Resting Blood Pressure", min_value=0)
-        chol_heart = st.number_input("Serum Cholestoral in mg/dl", min_value=0)
-        fbs_heart = st.number_input("Fasting Blood Sugar > 120 mg/dl", min_value=0, max_value=1)
-        restecg_heart = st.number_input("Resting Electrocardiographic results", min_value=0, max_value=2)
-        thalach_heart = st.number_input("Maximum Heart Rate achieved", min_value=0)
-        exang_heart = st.number_input("Exercise Induced Angina", min_value=0, max_value=1)
-        oldpeak_heart = st.number_input("Depression Induced by Exercise", min_value=0.0)
-        slope_heart = st.number_input("Slope of the Peak Exercise ST segment", min_value=0, max_value=2)
-        ca_heart = st.number_input("Number of Major Vessels colored by Fluoroscopy", min_value=0, max_value=4)
-        thal_heart = st.number_input("Thalassemia", min_value=0, max_value=3)
+        col1, col2, col3 = st.columns(3)
+        with col1:
+            age_heart = st.number_input("Age", min_value=0)
+            sex_heart = st.number_input("Sex", min_value=0, max_value=1)
+            cp_heart = st.number_input("Chest Pain", min_value=0, max_value=3)
+            trestbps_heart = st.number_input("Resting BP", min_value=0)
+            chol_heart = st.number_input("Cholesterol", min_value=0)
+        with col2:
+            fbs_heart = st.number_input("Fasting BS (>120)", min_value=0, max_value=1)
+            restecg_heart = st.number_input("Resting ECG", min_value=0, max_value=2)
+            thalach_heart = st.number_input("Max Heart Rate", min_value=0)
+            exang_heart = st.number_input("Exercise Angina", min_value=0, max_value=1)
+        with col3:
+            oldpeak_heart = st.number_input("Oldpeak", min_value=0.0)
+            slope_heart = st.number_input("Slope", min_value=0, max_value=2)
+            ca_heart = st.number_input("Major Vessels", min_value=0, max_value=4)
+            thal_heart = st.number_input("Thalassemia", min_value=0, max_value=3)
+            st.empty()
 
         if st.button("Heart Disease Test Result"):
             input_features = [age_heart, sex_heart, cp_heart, trestbps_heart, chol_heart, fbs_heart, restecg_heart, thalach_heart, exang_heart, oldpeak_heart, slope_heart, ca_heart, thal_heart]

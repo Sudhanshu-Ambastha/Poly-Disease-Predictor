@@ -56,7 +56,7 @@ pytz==2025.2
 PyYAML==6.0.2
 pyzmq==26.4.0
 referencing==0.36.2
-requests==2.32.3
+requests==2.32.4
 rpds-py==0.24.0
 scikit-learn==1.6.1
 scipy==1.15.2

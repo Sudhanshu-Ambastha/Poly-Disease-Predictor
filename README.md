@@ -5,6 +5,11 @@ PolyDisease Predictor is a Streamlit web application that uses machine learning 
 ## Usage
 
 **Prerequisites:**
+<p align="center">
+  <a href="https://github.com/LelouchFR/skill-icons">
+    <img src="https://go-skill-icons.vercel.app/api/icons?i=py,anaconda,streamlit,mysql" />
+  </a>
+</p>
 
   * Python 3.6+
   * Anaconda or Miniconda (recommended)

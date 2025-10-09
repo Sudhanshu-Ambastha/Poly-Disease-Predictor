@@ -1,1 +1,7 @@
 secrets.toml
+.devcontainer/
+__pycache__/
+*.pyc
+.venv/
+.env
+tmp/
